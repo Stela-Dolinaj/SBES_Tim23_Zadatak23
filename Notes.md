@@ -9,6 +9,10 @@
       - scadaTemperature2
       - scadaVoltage1
       - scadaVoltage2
+  * groups
+      - Pressure
+      - Temperature
+      - Voltage
 
 - Autentifikacija => PUTEM SERTIFIKATA, CHAIN TRUST validacija sertifikata (vezba 3)
     - medju klijentima
