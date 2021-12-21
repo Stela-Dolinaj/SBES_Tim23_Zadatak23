@@ -1,0 +1,31 @@
+1. Making a cert authority:
+makecert -n "CN=CertAuth" -r -sv CertAuth.pvk CertAuth.cer
+
+2. Making .pvk/.cer certs for admin:
+makecert -sv WCFService.pvk -iv TestCA.pvk -n "CN=wcfservice"  -pe -ic TestCA.cer WCFService.cer -sr localmachine -ss My -sky exchange
+
+3. Making a .pfx cert for admin:
+pvk2pfx.exe /pvk WCFService.pvk /pi 1234 /spc WCFService.cer /pfx WCFService.pfx
+
+4. Making .pvk/.cer certs for client:
+makecert -sv Barometar1.pvk -iv CertAuth.pvk -n "CN=barometar1,OU=Barometar" -pe -ic CertAuth.cer Barometar1.cer -sr localmachine -ss My -sky exchange
+makecert -sv Barometar2.pvk -iv CertAuth.pvk -n "CN=barometar2,OU=Barometar" -pe -ic CertAuth.cer Barometar2.cer -sr localmachine -ss My -sky exchange
+itd.
+
+5. Making a .pfx cert for client:
+pvk2pfx.exe /pvk Barometar1.pvk /pi 1 /spc Barometar1.cer /pfx Barometar1.pfx
+pvk2pfx.exe /pvk Barometar2.pvk /pi 1 /spc Barometar2.cer /pfx Barometar2.pfx
+itd.
+
+Sifra za sve je: 1.
+Svi username-ovi su : barometar1, barometar2, senzorZvuka1, senzorZvuka2, senzorTemp1, senzorTemp2
+Sve grupe su: Barometar, SenzorTemp, SenzorZvuka
+
+
+
+
+
+
+
+
+

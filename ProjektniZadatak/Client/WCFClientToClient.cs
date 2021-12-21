@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-	public class WCFClient : ChannelFactory<IWCFContract>, IWCFContract, IDisposable
+	public class WCFClientToClient : ChannelFactory<IWCFContractClientToClient>, IWCFContractClientToClient, IDisposable
 	{
-		IWCFContract factory;
+		IWCFContractClientToClient factory;
 
-		public WCFClient(NetTcpBinding binding, EndpointAddress address)
+		public WCFClientToClient(NetTcpBinding binding, EndpointAddress address)
 			: base(binding, address)
 		{
 			/// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
@@ -57,42 +57,6 @@ namespace Client
 			}
 		}
 
-        public void SendPressure(string message, byte[] sign)
-        {
-			try
-			{
-				factory.SendPressure(message, sign);
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine("[SendPressure] ERROR = {0}", e.Message);
-			}
-		}
-
-        public void SendTemp(string message, byte[] sign)
-        {
-			try
-			{
-				factory.SendTemp(message, sign);
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine("[SendTemp] ERROR = {0}", e.Message);
-			}
-		}
-
-        public void SendSound(string message, byte[] sign)
-        {
-			try
-			{
-				factory.SendSound(message, sign);
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine("[SendSound] ERROR = {0}", e.Message);
-			}
-		}
-
 		public void Dispose()
 		{
 			if (factory != null)
@@ -102,5 +66,37 @@ namespace Client
 
 			this.Close();
 		}
-	}
+
+        public void StopSending()
+        {
+			try
+			{
+				factory.StopSending();
+			}
+			catch (EndpointNotFoundException)
+            {
+				Console.WriteLine("Client not yet up.");
+            }
+			catch (Exception e)
+			{
+                Console.WriteLine("[StopSending] ERROR = {0}", e.Message);
+            }
+		}
+
+        public void ContinueSending()
+        {
+			try
+			{
+				factory.ContinueSending();
+			}
+			catch (EndpointNotFoundException)
+			{
+				Console.WriteLine("Client not yet up.");
+			}
+			catch (Exception e)
+			{
+                Console.WriteLine("[ContinueSending] ERROR = {0}", e.Message);
+            }
+		}
+    }
 }

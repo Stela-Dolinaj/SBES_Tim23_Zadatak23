@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Contracts
 {
 	[ServiceContract]
-	public interface IWCFContract
+	public interface IWCFContractClientToClient
 	{
 		[OperationContract]
 		void TestCommunication();
@@ -17,12 +17,9 @@ namespace Contracts
 		void SendMessage(string message, byte[] sign);
 
 		[OperationContract]
-		void SendPressure(string message, byte[] sign);
+		void StopSending();
 
 		[OperationContract]
-		void SendTemp(string message, byte[] sign);
-
-		[OperationContract]
-		void SendSound(string message, byte[] sign);
+		void ContinueSending();
 	}
 }
