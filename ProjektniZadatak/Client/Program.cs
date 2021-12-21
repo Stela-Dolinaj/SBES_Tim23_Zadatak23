@@ -1,4 +1,5 @@
-﻿using Manager;
+﻿using Contracts;
+using Manager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,7 +70,15 @@ namespace Client
             using (ServiceHost serviceHost = 
                 new ServiceHost(typeof(DatabaseRestrictionsService)))
             {
+                serviceHost.Open();
+                Console.WriteLine("Client Service Opened @"
+                    + DateTime.Now.ToLongTimeString());
 
+                ChannelFactory<IDatabaseHandling> channelServiceCommunication =
+                    new ChannelFactory<IDatabaseHandling>("ServiceEndpoint");
+
+                IDatabaseHandling proxyService =
+                    channelServiceCommunication.CreateChannel();
             }
         }
     }
