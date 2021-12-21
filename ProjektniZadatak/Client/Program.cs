@@ -8,6 +8,8 @@ using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.DirectoryServices.AccountManagement;
+using Contracts.Enums;
 
 namespace Client
 {
@@ -79,6 +81,51 @@ namespace Client
 
                 IDatabaseHandling proxyService =
                     channelServiceCommunication.CreateChannel();
+
+                SetClientGroup();
+
+                try
+                {
+                    
+                }
+                catch (InvalidOperationException e)
+                {
+                    Console.WriteLine("Error >> " + e.Message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
+        private static void SetClientGroup()
+        {
+            PrincipalSearchResult<Principal> groups =
+                UserPrincipal.Current.GetGroups();
+            List<string> groupNames = groups.Select(x => x.SamAccountName).ToList();
+
+            foreach (var name in groupNames)
+            {
+                switch (name)
+                {
+                    case "Barometri":
+                        DatabaseRestrictionsService.ClientGroup = 
+                            UserGroup.Barometri;
+                        break;
+                    case "SenzoriTemperature":
+                        DatabaseRestrictionsService.ClientGroup = 
+                            UserGroup.SenzoriTemperature;
+                        break;
+                    case "SenzoriZvuka":
+                        DatabaseRestrictionsService.ClientGroup = 
+                            UserGroup.SenzoriZvuka;
+                        break;
+                    default:
+                        DatabaseRestrictionsService.ClientGroup = 
+                            UserGroup.NULL;
+                        break;
+                }
             }
         }
     }
