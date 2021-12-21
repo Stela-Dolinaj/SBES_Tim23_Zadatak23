@@ -16,8 +16,10 @@ namespace Server
     {
         static void Main(string[] args)
         {
-			/// srvCertCN.SubjectName should be set to the service's username. .NET WindowsIdentity class provides information about Windows user running the given process
-			string srvCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+            #region COMMENT
+            /*
+            /// srvCertCN.SubjectName should be set to the service's username. .NET WindowsIdentity class provides information about Windows user running the given process
+            string srvCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
 
 			NetTcpBinding binding = new NetTcpBinding();
 			binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
@@ -51,6 +53,10 @@ namespace Server
 			{
 				host.Close();
 			}
-		}
+            */
+            #endregion
+
+
+        }
     }
 }

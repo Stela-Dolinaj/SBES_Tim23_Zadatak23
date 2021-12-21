@@ -14,6 +14,8 @@ namespace Client
     {
         static void Main(string[] args)
         {
+            #region COMMENTED
+            /*
             /// Define the expected service certificate. It is required to establish cmmunication using certificates.
             string srvCertCN = "wcfservice";
 
@@ -60,6 +62,13 @@ namespace Client
                 proxy.SendMessage(message, wrongSign);
 
                 Console.ReadLine();
+            }
+        */
+            #endregion
+
+            using (ServiceHost serviceHost = 
+                new ServiceHost(typeof(DatabaseRestrictionsService)))
+            {
 
             }
         }
