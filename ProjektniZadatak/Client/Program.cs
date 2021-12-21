@@ -76,13 +76,42 @@ namespace Client
                 Console.WriteLine("Client Service Opened @"
                     + DateTime.Now.ToLongTimeString());
 
+                #region SAZNAJEM GRUPU KORISNIKA
+
+                PrincipalSearchResult<Principal> groups =
+                                UserPrincipal.Current.GetGroups();
+
+                List<string> groupNames = groups.Select(x => x.SamAccountName).ToList();
+
+                if (groupNames.Contains("Barometri"))
+                {
+                    Console.WriteLine("User je BAROMETAR.");
+                    DatabaseRestrictionsService.ClientGroup = UserGroup.Barometri;
+                }
+                else if (groupNames.Contains("SenzoriTemperature"))
+                {
+                    Console.WriteLine("User je SENZOR TEMPERATURE.");
+                    DatabaseRestrictionsService.ClientGroup = UserGroup.SenzoriTemperature;
+                }
+                else if (groupNames.Contains("SenzoriZvuka"))
+                {
+                    Console.WriteLine("User je SENZOR ZVUKA.");
+                    DatabaseRestrictionsService.ClientGroup = UserGroup.SenzoriZvuka;
+                }
+                else
+                {
+                    DatabaseRestrictionsService.ClientGroup = UserGroup.NULL;
+                }
+
+                #endregion
+
+                #region RAD SA SERVERSKIM ENDPOINTOM
+
                 ChannelFactory<IDatabaseHandling> channelServiceCommunication =
                     new ChannelFactory<IDatabaseHandling>("ServiceEndpoint");
 
                 IDatabaseHandling proxyService =
                     channelServiceCommunication.CreateChannel();
-
-                SetClientGroup();
 
                 try
                 {
@@ -98,36 +127,8 @@ namespace Client
                 {
                     Console.WriteLine(e.Message);
                 }
-            }
-        }
 
-        private static void SetClientGroup()
-        {
-            PrincipalSearchResult<Principal> groups =
-                UserPrincipal.Current.GetGroups();
-            List<string> groupNames = groups.Select(x => x.SamAccountName).ToList();
-
-            foreach (var name in groupNames)
-            {
-                switch (name)
-                {
-                    case "Barometri":
-                        DatabaseRestrictionsService.ClientGroup = 
-                            UserGroup.Barometri;
-                        break;
-                    case "SenzoriTemperature":
-                        DatabaseRestrictionsService.ClientGroup = 
-                            UserGroup.SenzoriTemperature;
-                        break;
-                    case "SenzoriZvuka":
-                        DatabaseRestrictionsService.ClientGroup = 
-                            UserGroup.SenzoriZvuka;
-                        break;
-                    default:
-                        DatabaseRestrictionsService.ClientGroup = 
-                            UserGroup.NULL;
-                        break;
-                }
+                #endregion
             }
         }
     }
