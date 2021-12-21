@@ -56,7 +56,14 @@ namespace Server
             */
             #endregion
 
+            using (ServiceHost serviceHost = 
+                new ServiceHost(typeof(DatabaseHandlingService)))
+            {
+                serviceHost.Open();
 
+                Console.WriteLine("DataBase Service Opened @" + DateTime.Now.ToLongTimeString());
+                Console.ReadLine();
+            }
         }
     }
 }
