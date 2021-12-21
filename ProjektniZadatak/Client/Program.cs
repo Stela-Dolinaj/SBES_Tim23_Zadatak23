@@ -86,7 +86,9 @@ namespace Client
 
                 try
                 {
-                    
+                    proxyService.WriteToDatabase("Test1", DatabaseRestrictionsService.ClientGroup);
+
+                    proxyService.WriteToDatabase("Test2", DatabaseRestrictionsService.ClientGroup);
                 }
                 catch (InvalidOperationException e)
                 {
