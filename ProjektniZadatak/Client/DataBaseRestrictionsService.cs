@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    public class DataBaseRestrictionsService : IDatabaseRestrictions
+    public class DatabaseRestrictionsService : IDatabaseRestrictions
     {
         public static UserGroup ClientGroup = UserGroup.NULL;
         public static bool IAmCurrentlyWriting = false;
