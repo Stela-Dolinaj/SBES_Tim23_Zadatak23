@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Contracts.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -8,12 +9,12 @@ using System.Threading.Tasks;
 namespace Contracts
 {
     [ServiceContract]
-    public interface IDatabaseRestrictions
+    public interface IClientCommunications
     {
         [OperationContract]
-        void NotifyConnectionIsClosed();
+        bool SendMessage(string messageForClients, UserGroup clientGroup);
 
         [OperationContract]
-        void NotifyConnectionIsOpen();
+        void TestCommunication();
     }
 }

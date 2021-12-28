@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="Enums\UserGroup.cs" />
     <Compile Include="IDatabaseHandling.cs" />
-    <Compile Include="IDatabaseRestrictions.cs" />
+    <Compile Include="IClientCommunications.cs" />
     <Compile Include="IWCFContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

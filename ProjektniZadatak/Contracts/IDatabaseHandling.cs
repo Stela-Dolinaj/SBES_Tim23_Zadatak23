@@ -12,6 +12,6 @@ namespace Contracts
     public interface IDatabaseHandling
     {
         [OperationContract]
-        bool WriteToDatabase(string message, UserGroup userGroup);
+        void WriteToDatabase(string message, UserGroup userGroup);
     }
 }

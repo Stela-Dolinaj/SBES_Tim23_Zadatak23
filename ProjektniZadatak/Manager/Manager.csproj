@@ -49,5 +49,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceCertValidator.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Contracts\Contracts.csproj">
+      <Project>{BBC43593-6BC9-438A-83F4-C2A5C2D4EA7B}</Project>
+      <Name>Contracts</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

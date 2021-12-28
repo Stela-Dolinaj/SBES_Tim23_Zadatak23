@@ -69,67 +69,8 @@ namespace Client
         */
             #endregion
 
-            using (ServiceHost serviceHost = 
-                new ServiceHost(typeof(DatabaseRestrictionsService)))
-            {
-                serviceHost.Open();
-                Console.WriteLine("Client Service Opened @"
-                    + DateTime.Now.ToLongTimeString());
-
-                #region SAZNAJEM GRUPU KORISNIKA
-
-                PrincipalSearchResult<Principal> groups =
-                                UserPrincipal.Current.GetGroups();
-
-                List<string> groupNames = groups.Select(x => x.SamAccountName).ToList();
-
-                if (groupNames.Contains("Barometri"))
-                {
-                    Console.WriteLine("User je BAROMETAR.");
-                    DatabaseRestrictionsService.ClientGroup = UserGroup.Barometri;
-                }
-                else if (groupNames.Contains("SenzoriTemperature"))
-                {
-                    Console.WriteLine("User je SENZOR TEMPERATURE.");
-                    DatabaseRestrictionsService.ClientGroup = UserGroup.SenzoriTemperature;
-                }
-                else if (groupNames.Contains("SenzoriZvuka"))
-                {
-                    Console.WriteLine("User je SENZOR ZVUKA.");
-                    DatabaseRestrictionsService.ClientGroup = UserGroup.SenzoriZvuka;
-                }
-                else
-                {
-                    DatabaseRestrictionsService.ClientGroup = UserGroup.NULL;
-                }
-
-                #endregion
-
-                #region RAD SA SERVERSKIM ENDPOINTOM
-
-                ChannelFactory<IDatabaseHandling> channelServiceCommunication =
-                    new ChannelFactory<IDatabaseHandling>("ServiceEndpoint");
-
-                IDatabaseHandling proxyService =
-                    channelServiceCommunication.CreateChannel();
-
-                try
-                {
-                    proxyService.WriteToDatabase("Test1", DatabaseRestrictionsService.ClientGroup);
-
-                    proxyService.WriteToDatabase("Test2", DatabaseRestrictionsService.ClientGroup);
-                }
-                catch (InvalidOperationException e)
-                {
-                    Console.WriteLine("Error >> " + e.Message);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-
-                #endregion
-            }
+            
+            
         }
     }
 }
