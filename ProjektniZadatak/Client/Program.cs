@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Client
 {
+   
     class Program
     {
         static void Main(string[] args)
@@ -19,7 +20,7 @@ namespace Client
 
             /// Define the expected certificate for signing ("<username>_sign" is the expected subject name).
             /// .NET WindowsIdentity class provides information about Windows user running the given process
-            string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_sign";
+            string clientCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
 
             /// Define subjectName for certificate used for signing which is not as expected by the service
             string wrongCertCN = "wrong_sign";
@@ -33,6 +34,12 @@ namespace Client
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9999/Receiver"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
+            
+              X509Certificate2 clientCert = CertManager.GetCertificateFromStorage(StoreName.My,
+                StoreLocation.LocalMachine, clientCertCN);
+            //odavde izvuci kojoj grupi pripada
+            //CN=barometar1,OU=Barometar pars dva puta
+
             using (WCFClient proxy = new WCFClient(binding, address))
             {
                 /// 1. Communication test
@@ -45,7 +52,7 @@ namespace Client
 
                 /// Create a signature based on the "signCertCN" using SHA1 hash algorithm
                 Console.WriteLine("Created sign");
-                X509Certificate2 signCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
+                X509Certificate2 signCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, clientCertCN);
                 byte[] sign = DigitalSignature.Create(message, HashAlgorithm.SHA1, signCert);
 
                 /// For the same message, create a signature based on the "wrongCertCN" using SHA1 hash algorithm
