@@ -32,7 +32,17 @@ namespace Client
 
 			factory = this.CreateChannel();
 		}
-
+        public bool Order(string state)
+        {
+            if(state == "Start")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 		public void TestCommunication()
 		{
 			try
