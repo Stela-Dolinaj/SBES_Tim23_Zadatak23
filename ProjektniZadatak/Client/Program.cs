@@ -69,8 +69,59 @@ namespace Client
         */
             #endregion
 
-            
-            
+
+            // Serverski sertifikat
+            string serverCertNC = "wcfservice";
+
+            NetTcpBinding binding = new NetTcpBinding();
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+            // izvlacenje serverskog sertifikata iz TRUSTED PEOPLE-a
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(
+                StoreName.TrustedPeople, 
+                StoreLocation.LocalMachine, 
+                serverCertNC);
+
+            // endpoint za KLIJENT to KLIJENT komunikaciju
+            EndpointAddress C2DBEndpointAddress = new EndpointAddress(
+                new Uri("net.tcp://localhost:8080/DbService"),
+                new X509CertificateEndpointIdentity(srvCert));
+            // endpoint za KLIJENT to DATABASE komunikaciju
+            EndpointAddress C2CEndpointAddress = new EndpointAddress(
+                new Uri("net.tcp://localhost:8090/ClientCommunication"),
+                new X509CertificateEndpointIdentity(srvCert));
+
+            //using (WCFClient2Db proxyC2DB = new WCFClient2Db(binding, C2DBEndpointAddress))
+            //{
+            //    proxyC2DB.TestCommunication();
+
+            //    Console.WriteLine("Test C2DB done!");
+            //}
+
+            //using (WCFClient2Client proxyC2C = new WCFClient2Client(binding, C2CEndpointAddress))
+            //{
+            //    proxyC2C.TestCommunication();
+
+            //    Console.WriteLine("Test C2C done!");
+            //}
+
+            // KLIJENT - DATABASE
+            WCFClient2Db proxyC2DB = new WCFClient2Db(binding, C2DBEndpointAddress);
+
+            // KLIJENT - KLIJENT
+            WCFClient2Client proxyC2C = new WCFClient2Client(binding, C2CEndpointAddress);
+
+            proxyC2C.TestCommunication();
+
+            Console.WriteLine("Test C2C done!");
+
+            proxyC2DB.TestCommunication();
+
+            Console.WriteLine("Test C2DB done!");
+
+            Console.WriteLine("Tests done!");
+
+            Console.ReadLine();
         }
     }
 }

@@ -13,5 +13,8 @@ namespace Contracts
     {
         [OperationContract]
         void WriteToDatabase(string message, UserGroup userGroup);
+
+        [OperationContract]
+        void TestCommunication();
     }
 }

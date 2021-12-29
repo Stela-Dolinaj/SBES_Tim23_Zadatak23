@@ -50,5 +50,17 @@ namespace Client
                 Console.WriteLine("[ERROR]: " + e.Message);
             }
         }
+
+        public void TestCommunication()
+        {
+            try
+            {
+                proxy.TestCommunication();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[ERROR]: " + e.Message);
+            }
+        }
     }
 }
