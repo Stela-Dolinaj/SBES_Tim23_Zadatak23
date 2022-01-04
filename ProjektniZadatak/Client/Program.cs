@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.DirectoryServices.AccountManagement;
 using Contracts.Enums;
+using System.Diagnostics;
 
 namespace Client
 {
@@ -69,6 +70,8 @@ namespace Client
         */
             #endregion
 
+            // pokreni visualstudio u admin modu da bi Debugger.Launch() radilo
+            //Debugger.Launch();
 
             // Serverski sertifikat
             string serverCertNC = "wcfservice";
@@ -77,10 +80,8 @@ namespace Client
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             // izvlacenje serverskog sertifikata iz TRUSTED PEOPLE-a
-            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(
-                StoreName.TrustedPeople, 
-                StoreLocation.LocalMachine, 
-                serverCertNC);
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople,
+                StoreLocation.LocalMachine, serverCertNC);
 
             // endpoint za KLIJENT to KLIJENT komunikaciju
             EndpointAddress C2DBEndpointAddress = new EndpointAddress(

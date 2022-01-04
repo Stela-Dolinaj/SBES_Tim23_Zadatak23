@@ -95,6 +95,7 @@ namespace Server
             {
                 Console.WriteLine("[ERROR] " + e.Message);
                 Console.WriteLine("[StackTrace] " + e.StackTrace);
+                Console.ReadLine();
             }
             finally
             {

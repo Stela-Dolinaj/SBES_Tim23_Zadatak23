@@ -27,9 +27,14 @@ namespace Manager
 			X509Certificate2Collection certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, true);
 
 			/// Check whether the subjectName of the certificate is exactly the same as the given "subjectName"
+
 			foreach (X509Certificate2 c in certCollection)
 			{
-				if (c.SubjectName.Name.Equals(string.Format("CN={0}", subjectName)))
+                //if (c.SubjectName.Name.Equals(string.Format("CN={0}", subjectName)))
+                //{
+                //    return c;
+                //}
+                if (c.SubjectName.Name.Contains(string.Format("CN={0}", subjectName)))
 				{
 					return c;
 				}
@@ -37,6 +42,27 @@ namespace Manager
 
 			return null;
 		}
+
+        // TO DO: IZVUCI GRUPU IZ SERTIFIKATA
+        public static UserGroup GetMyGroupFromCert(X509Certificate2 cert)
+        {
+            if (cert.SubjectName.Name.Contains(string.Format("OU=Barometar")))
+            {
+                return UserGroup.Barometri;
+            }
+            else if (cert.SubjectName.Name.Contains(string.Format("OU=SenzorTemp")))
+            {
+                return UserGroup.SenzoriTemperature;
+            }
+            else if (cert.SubjectName.Name.Contains(string.Format("OU=SenzorZvuka")))
+            {
+                return UserGroup.SenzoriZvuka;
+            }
+            else
+            {
+                return UserGroup.NULL;
+            }
+        }
 
         public static UserGroup GetMyGroup(WindowsIdentity myIdentity)
         {
@@ -55,11 +81,11 @@ namespace Manager
 
             switch (myGroup.ToLower())
             {
-                case "barometri":
+                case "barometar":
                     return UserGroup.Barometri;
-                case "senzoritemperature":
+                case "senzortemp":
                     return UserGroup.SenzoriTemperature;
-                case "senzorizvuka":
+                case "senzorzvuka":
                     return UserGroup.SenzoriZvuka;
                 default:
                     return UserGroup.NULL;
