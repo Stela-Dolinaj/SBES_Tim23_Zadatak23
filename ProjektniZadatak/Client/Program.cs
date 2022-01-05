@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.DirectoryServices.AccountManagement;
 using Contracts.Enums;
+using System.Diagnostics;
 
 namespace Client
 {
@@ -69,6 +70,8 @@ namespace Client
         */
             #endregion
 
+            // pokreni visualstudio u admin modu da bi Debugger.Launch() radilo
+            //Debugger.Launch();
 
             // Serverski sertifikat
             string serverCertNC = "wcfservice";
@@ -77,10 +80,8 @@ namespace Client
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             // izvlacenje serverskog sertifikata iz TRUSTED PEOPLE-a
-            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(
-                StoreName.TrustedPeople, 
-                StoreLocation.LocalMachine, 
-                serverCertNC);
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople,
+                StoreLocation.LocalMachine, serverCertNC);
 
             // endpoint za KLIJENT to KLIJENT komunikaciju
             EndpointAddress C2DBEndpointAddress = new EndpointAddress(
@@ -111,15 +112,81 @@ namespace Client
             // KLIJENT - KLIJENT
             WCFClient2Client proxyC2C = new WCFClient2Client(binding, C2CEndpointAddress);
 
-            proxyC2C.TestCommunication();
+            //proxyC2C.TestCommunication();
 
-            Console.WriteLine("Test C2C done!");
+            Console.WriteLine("START 1... Press [enter] to continue execution..");
+            Console.ReadLine();
 
-            proxyC2DB.TestCommunication();
+            // START
+            if (proxyC2C.SendMessage(ClientMessage.start.ToString(), proxyC2C.myGroup))
+            {
+                Console.WriteLine(">> Message [start] sent.");
+            }
+            else
+            {
+                Console.WriteLine(">> Message [start] can't be sent.");
+            }
 
-            Console.WriteLine("Test C2DB done!");
+            Console.WriteLine("START 2... Press [enter] to continue execution..");
+            Console.ReadLine();
 
-            Console.WriteLine("Tests done!");
+            // START
+            if (proxyC2C.SendMessage(ClientMessage.start.ToString(), proxyC2C.myGroup))
+            {
+                Console.WriteLine(">> Message [start] sent.");
+            }
+            else
+            {
+                Console.WriteLine(">> Message [start] can't be sent.");
+            }
+
+            Console.WriteLine("STOP 1... Press [enter] to continue execution..");
+            Console.ReadLine();
+
+            // STOP
+            if (proxyC2C.SendMessage(ClientMessage.stop.ToString(), proxyC2C.myGroup))
+            {
+                Console.WriteLine(">> Message [stop] sent.");
+            }
+            else
+            {
+                Console.WriteLine(">> Message [stop] can't be sent.");
+            }
+
+            Console.WriteLine("STOP 2... Press [enter] to continue execution..");
+            Console.ReadLine();
+
+            // STOP
+            if (proxyC2C.SendMessage(ClientMessage.stop.ToString(), proxyC2C.myGroup))
+            {
+                Console.WriteLine(">> Message [stop] sent.");
+            }
+            else
+            {
+                Console.WriteLine(">> Message [stop] can't be sent.");
+            }
+
+            Console.WriteLine("START 3... Press [enter] to continue execution..");
+            Console.ReadLine();
+
+            // START
+            if (proxyC2C.SendMessage(ClientMessage.start.ToString(), proxyC2C.myGroup))
+            {
+                Console.WriteLine(">> Message [start] sent.");
+            }
+            else
+            {
+                Console.WriteLine(">> Message [start] can't be sent.");
+            }
+
+            Console.WriteLine("\nTest C2C done!\n\n\n");
+
+            //proxyC2DB.TestCommunication();
+            proxyC2DB.WriteToDatabase("Test Message 1", proxyC2DB.myGroup);
+
+            Console.WriteLine("\nTest C2DB done!\n\n\n");
+
+            Console.WriteLine("\n\n\nALL Tests done!");
 
             Console.ReadLine();
         }

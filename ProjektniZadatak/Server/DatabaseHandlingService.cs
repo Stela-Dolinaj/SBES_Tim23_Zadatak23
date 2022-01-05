@@ -11,15 +11,15 @@ namespace Server
 {
     public class DatabaseHandlingService : IDatabaseHandling, IClientCommunications
     {
-        private bool barometriDatabaseOpen;
-        private bool senzoriTemperatureDatabaseOpen;
-        private bool senzoriZvukaDatabaseOpen;
+        private static bool barometriDatabaseOpen = true;
+        private static bool senzoriTemperatureDatabaseOpen = true;
+        private static bool senzoriZvukaDatabaseOpen = true;
 
         public DatabaseHandlingService()
         {
-            barometriDatabaseOpen = true;
-            senzoriTemperatureDatabaseOpen = true;
-            senzoriZvukaDatabaseOpen = true;
+            //barometriDatabaseOpen = true;
+            //senzoriTemperatureDatabaseOpen = true;
+            //senzoriZvukaDatabaseOpen = true;
         }
         /// <summary>
         /// Stize poruka na servis.
@@ -38,12 +38,18 @@ namespace Server
                 case UserGroup.NULL:
                     throw new InvalidOperationException("Client has no group.");
                 case UserGroup.Barometri:
+                    /// Ako je klijent poslao STOP
+                    /// -> zavrsio je upis u BP i zeli da otvori kanal
                     if (messageForClients.ToLower().Equals("stop"))
                     {
                         barometriDatabaseOpen = true;
                         Console.WriteLine("[Barometri]: OPEN");
                         return true;
                     }
+                    /// Ako je klijent poslao START
+                    /// -> zeli da upisuje u BP
+                    /// -> ako je kanal OTVOREN, zatvorice ga i dobice povratnu vrednost TRUE, kako bi znao da moze da upisuje
+                    /// -> ako je kanal ZATVOREN, dobice povratnu vrednost FALSE, kako bi znao da ne moze da upisuje
                     else if (messageForClients.ToLower().Equals("start"))
                     {
                         if (barometriDatabaseOpen)
