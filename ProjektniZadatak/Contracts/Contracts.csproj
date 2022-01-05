@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BBC43593-6BC9-438A-83F4-C2A5C2D4EA7B}</ProjectGuid>
+    <ProjectGuid>{62CAE0AA-9F3A-4239-B65B-C75B50E64EA1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Contracts</RootNamespace>
@@ -42,9 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums\UserGroup.cs" />
-    <Compile Include="IDatabaseHandling.cs" />
-    <Compile Include="IClientCommunications.cs" />
     <Compile Include="IWCFContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

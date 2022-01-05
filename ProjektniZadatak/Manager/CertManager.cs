@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography.X509Certificates;
 using System.Security;
-using Contracts.Enums;
-using System.Security.Principal;
 
 namespace Manager
 {
@@ -38,42 +36,13 @@ namespace Manager
 			return null;
 		}
 
-        public static UserGroup GetMyGroup(WindowsIdentity myIdentity)
-        {
-            string myGroup = string.Empty;
 
-            foreach (IdentityReference group in myIdentity.Groups)
-            {
-                SecurityIdentifier sid = (SecurityIdentifier)group.Translate(typeof(SecurityIdentifier));
-                string groupName = Formatter.ParseName(sid.Translate(typeof(NTAccount)).ToString()).ToLower();
-                if (groupName.Equals("barometar") || groupName.Equals("senzorzvuka") || groupName.Equals("senzortemp"))
-                {
-                    myGroup = groupName;
-                    break;
-                }
-            }
-
-            switch (myGroup.ToLower())
-            {
-                case "barometri":
-                    return UserGroup.Barometri;
-                case "senzoritemperature":
-                    return UserGroup.SenzoriTemperature;
-                case "senzorizvuka":
-                    return UserGroup.SenzoriZvuka;
-                default:
-                    return UserGroup.NULL;
-            }
-
-        }
-
-
-        /// <summary>
-        /// Get a certificate from file.		
-        /// </summary>
-        /// <param name="fileName"> .cer file name </param>
-        /// <returns> The requested certificate. If no valid certificate is found, returns null. </returns>
-        public static X509Certificate2 GetCertificateFromFile(string fileName)
+		/// <summary>
+		/// Get a certificate from file.		
+		/// </summary>
+		/// <param name="fileName"> .cer file name </param>
+		/// <returns> The requested certificate. If no valid certificate is found, returns null. </returns>
+		public static X509Certificate2 GetCertificateFromFile(string fileName)
 		{
 			X509Certificate2 certificate = null;
 			

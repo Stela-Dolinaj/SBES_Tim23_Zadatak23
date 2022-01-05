@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
 using System.Text;
-using System.Threading.Tasks;
+using System.ServiceModel;
 
 namespace Contracts
 {
@@ -14,6 +13,15 @@ namespace Contracts
 		void TestCommunication();
 
 		[OperationContract]
-		void SendMessage(string message, byte[] sign);
+		bool SendMessage(string message, byte[] sign);
+
+		[OperationContract]
+		void WriteTemp(string message, byte[] sign);
+
+		[OperationContract]
+		void WritePressure(string message, byte[] sign);
+
+		[OperationContract]
+		void WriteSound(string message, byte[] sign);
 	}
 }
