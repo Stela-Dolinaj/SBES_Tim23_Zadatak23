@@ -16,7 +16,7 @@ namespace Client
         IClientCommunications, IDisposable
     {
         IClientCommunications proxy;
-        readonly UserGroup myGroup = UserGroup.NULL;
+        public readonly UserGroup myGroup = UserGroup.NULL;
 
         public WCFClient2Client(NetTcpBinding binding, EndpointAddress endpointAddress)
             : base(binding, endpointAddress)

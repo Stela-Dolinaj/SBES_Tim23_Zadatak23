@@ -15,7 +15,7 @@ namespace Client
     public class WCFClient2Db : ChannelFactory<IDatabaseHandling>, IDatabaseHandling, IDisposable
     {
         IDatabaseHandling proxy;
-        readonly UserGroup myGroup = UserGroup.NULL;
+        public readonly UserGroup myGroup = UserGroup.NULL;
 
         public WCFClient2Db(NetTcpBinding binding, EndpointAddress endpointAddress)
             : base(binding, endpointAddress)
