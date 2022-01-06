@@ -46,7 +46,6 @@
     <Compile Include="Enums\UserGroup.cs" />
     <Compile Include="IDatabaseHandling.cs" />
     <Compile Include="IClientCommunications.cs" />
-    <Compile Include="IWCFContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

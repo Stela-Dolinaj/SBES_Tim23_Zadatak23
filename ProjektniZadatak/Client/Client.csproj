@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WCFClient.cs" />
     <Compile Include="WCFClient2Client.cs" />
     <Compile Include="WCFClient2Db.cs" />
   </ItemGroup>
