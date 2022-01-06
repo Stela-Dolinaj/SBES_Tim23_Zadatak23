@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.DirectoryServices.AccountManagement;
 using Contracts.Enums;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Client
 {
@@ -18,58 +19,6 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            #region COMMENTED
-            /*
-            /// Define the expected service certificate. It is required to establish cmmunication using certificates.
-            string srvCertCN = "wcfservice";
-
-            /// Define the expected certificate for signing ("<username>_sign" is the expected subject name).
-            /// .NET WindowsIdentity class provides information about Windows user running the given process
-            string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_sign";
-
-            /// Define subjectName for certificate used for signing which is not as expected by the service
-            string wrongCertCN = "wrong_sign";
-
-            NetTcpBinding binding = new NetTcpBinding();
-            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-
-            /// Use CertManager class to obtain the certificate based on the "srvCertCN" representing the expected service identity.
-            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople,
-                StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9999/Receiver"),
-                                      new X509CertificateEndpointIdentity(srvCert));
-
-            using (WCFClient proxy = new WCFClient(binding, address))
-            {
-                /// 1. Communication test
-                proxy.TestCommunication();
-                Console.WriteLine("TestCommunication() finished. Press <enter> to continue ...");
-                Console.ReadLine();
-
-                /// 2. Digital Signing test	
-				string message = "Message";
-
-                /// Create a signature based on the "signCertCN" using SHA1 hash algorithm
-                Console.WriteLine("Created sign");
-                X509Certificate2 signCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
-                byte[] sign = DigitalSignature.Create(message, HashAlgorithm.SHA1, signCert);
-
-                /// For the same message, create a signature based on the "wrongCertCN" using SHA1 hash algorithm
-                Console.WriteLine("Created wrong sign");
-                X509Certificate2 wrongSignCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, wrongCertCN);
-                byte[] wrongSign = DigitalSignature.Create(message, HashAlgorithm.SHA1, wrongSignCert);
-
-                Console.WriteLine("Sent message with sign");
-                proxy.SendMessage(message, sign);
-
-                Console.WriteLine("Sent message with wrong sign");
-                proxy.SendMessage(message, wrongSign);
-
-                Console.ReadLine();
-            }
-        */
-            #endregion
-
             // pokreni visualstudio u admin modu da bi Debugger.Launch() radilo
             //Debugger.Launch();
 
@@ -92,103 +41,72 @@ namespace Client
                 new Uri("net.tcp://localhost:8090/ClientCommunication"),
                 new X509CertificateEndpointIdentity(srvCert));
 
-            //using (WCFClient2Db proxyC2DB = new WCFClient2Db(binding, C2DBEndpointAddress))
-            //{
-            //    proxyC2DB.TestCommunication();
-
-            //    Console.WriteLine("Test C2DB done!");
-            //}
-
-            //using (WCFClient2Client proxyC2C = new WCFClient2Client(binding, C2CEndpointAddress))
-            //{
-            //    proxyC2C.TestCommunication();
-
-            //    Console.WriteLine("Test C2C done!");
-            //}
-
             // KLIJENT - DATABASE
             WCFClient2Db proxyC2DB = new WCFClient2Db(binding, C2DBEndpointAddress);
 
             // KLIJENT - KLIJENT
             WCFClient2Client proxyC2C = new WCFClient2Client(binding, C2CEndpointAddress);
 
-            //proxyC2C.TestCommunication();
+            #region SEND MESSAGE
+            bool canStart;
+            UserGroup myGroup = proxyC2C.myGroup;
 
-            Console.WriteLine("START 1... Press [enter] to continue execution..");
-            Console.ReadLine();
+            while (true)
+            {
+                Console.WriteLine(">> Press [enter] to start sending. [q] - quit");
+                if (Console.ReadLine().Equals("q"))
+                    break;
 
-            // START
-            if (proxyC2C.SendMessage(ClientMessage.start.ToString(), proxyC2C.myGroup))
-            {
-                Console.WriteLine(">> Message [start] sent.");
-            }
-            else
-            {
-                Console.WriteLine(">> Message [start] can't be sent.");
-            }
+                canStart = proxyC2C.SendMessage(ClientMessage.start, proxyC2C.myGroup);
 
-            Console.WriteLine("START 2... Press [enter] to continue execution..");
-            Console.ReadLine();
+                if (canStart)
+                {
+                    // Pauza da bi se dokazalo da drugi klijenti iste grupe u ovom momentu ne mogu da pristupe bazi podataka
+                    Console.WriteLine(">> Ready to send message. Press [enter] to send.");
+                    Console.ReadLine();
 
-            // START
-            if (proxyC2C.SendMessage(ClientMessage.start.ToString(), proxyC2C.myGroup))
-            {
-                Console.WriteLine(">> Message [start] sent.");
-            }
-            else
-            {
-                Console.WriteLine(">> Message [start] can't be sent.");
-            }
+                    string message = GenerateMeasurement(myGroup);
+                    // sign poruku
 
-            Console.WriteLine("STOP 1... Press [enter] to continue execution..");
-            Console.ReadLine();
+                    Console.WriteLine(">> Sent message : " + message);
+                    proxyC2DB.WriteToDatabase(message, myGroup);
 
-            // STOP
-            if (proxyC2C.SendMessage(ClientMessage.stop.ToString(), proxyC2C.myGroup))
-            {
-                Console.WriteLine(">> Message [stop] sent.");
-            }
-            else
-            {
-                Console.WriteLine(">> Message [stop] can't be sent.");
+                    proxyC2C.SendMessage(ClientMessage.stop, myGroup);
+                }
+                else
+                {
+                    Console.WriteLine(">> Database is currently busy, try again...");
+                    Thread.Sleep(1500);
+                    Console.Clear();
+                }
             }
 
-            Console.WriteLine("STOP 2... Press [enter] to continue execution..");
-            Console.ReadLine();
+            Console.WriteLine("\n\n\n\n>> Testing done.. Closing...");
+            Thread.Sleep(2000);
+            #endregion
+        }
 
-            // STOP
-            if (proxyC2C.SendMessage(ClientMessage.stop.ToString(), proxyC2C.myGroup))
+        // Kreiranje poruke za upis u BP
+        private static string GenerateMeasurement(UserGroup myGroup)
+        {
+            Random random = new Random();
+            string myUsername = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+            string valueAndUnit = string.Empty;
+
+            switch (myGroup)
             {
-                Console.WriteLine(">> Message [stop] sent.");
-            }
-            else
-            {
-                Console.WriteLine(">> Message [stop] can't be sent.");
-            }
-
-            Console.WriteLine("START 3... Press [enter] to continue execution..");
-            Console.ReadLine();
-
-            // START
-            if (proxyC2C.SendMessage(ClientMessage.start.ToString(), proxyC2C.myGroup))
-            {
-                Console.WriteLine(">> Message [start] sent.");
-            }
-            else
-            {
-                Console.WriteLine(">> Message [start] can't be sent.");
+                case UserGroup.Barometri:
+                    valueAndUnit = $"Value: {random.Next(-100, 100)} [Pa]";
+                    break;
+                case UserGroup.SenzoriTemperature:
+                    valueAndUnit = $"Value: {random.Next(-100, 100)} [C]";
+                    break;
+                case UserGroup.SenzoriZvuka:
+                    valueAndUnit = $"Value: {random.Next(-100, 100)} [Db]";
+                    break;
             }
 
-            Console.WriteLine("\nTest C2C done!\n\n\n");
-
-            //proxyC2DB.TestCommunication();
-            proxyC2DB.WriteToDatabase("Test Message 1", proxyC2DB.myGroup);
-
-            Console.WriteLine("\nTest C2DB done!\n\n\n");
-
-            Console.WriteLine("\n\n\nALL Tests done!");
-
-            Console.ReadLine();
+            return $"Time: {DateTime.Now}, Username: {myUsername}, GroupName: {myGroup.ToString()}, {valueAndUnit}";
         }
     }
 }

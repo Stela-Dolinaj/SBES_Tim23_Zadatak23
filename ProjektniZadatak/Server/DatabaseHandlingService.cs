@@ -15,12 +15,6 @@ namespace Server
         private static bool senzoriTemperatureDatabaseOpen = true;
         private static bool senzoriZvukaDatabaseOpen = true;
 
-        public DatabaseHandlingService()
-        {
-            //barometriDatabaseOpen = true;
-            //senzoriTemperatureDatabaseOpen = true;
-            //senzoriZvukaDatabaseOpen = true;
-        }
         /// <summary>
         /// Stize poruka na servis.
         /// Analiziraj poruku:
@@ -31,7 +25,7 @@ namespace Server
         ///     Zavrsi zauzimanje kanala i vrati true.
         /// </summary>
         /// <param name="messageForClients"></param>
-        public bool SendMessage(string messageForClients, UserGroup clientGroup)
+        public bool SendMessage(ClientMessage messageForClients, UserGroup clientGroup)
         {
             switch (clientGroup)
             {
@@ -40,7 +34,7 @@ namespace Server
                 case UserGroup.Barometri:
                     /// Ako je klijent poslao STOP
                     /// -> zavrsio je upis u BP i zeli da otvori kanal
-                    if (messageForClients.ToLower().Equals("stop"))
+                    if (messageForClients.ToString().ToLower().Equals("stop"))
                     {
                         barometriDatabaseOpen = true;
                         Console.WriteLine("[Barometri]: OPEN");
@@ -50,7 +44,7 @@ namespace Server
                     /// -> zeli da upisuje u BP
                     /// -> ako je kanal OTVOREN, zatvorice ga i dobice povratnu vrednost TRUE, kako bi znao da moze da upisuje
                     /// -> ako je kanal ZATVOREN, dobice povratnu vrednost FALSE, kako bi znao da ne moze da upisuje
-                    else if (messageForClients.ToLower().Equals("start"))
+                    else if (messageForClients.ToString().ToLower().Equals("start"))
                     {
                         if (barometriDatabaseOpen)
                         {
@@ -69,13 +63,13 @@ namespace Server
                         return false;
                     }
                 case UserGroup.SenzoriTemperature:
-                    if (messageForClients.ToLower().Equals("stop"))
+                    if (messageForClients.ToString().ToLower().Equals("stop"))
                     {
                         senzoriTemperatureDatabaseOpen = true;
                         Console.WriteLine("[Temperatura]: OPEN");
                         return true;
                     }
-                    else if (messageForClients.ToLower().Equals("start"))
+                    else if (messageForClients.ToString().ToLower().Equals("start"))
                     {
                         if (senzoriTemperatureDatabaseOpen)
                         {
@@ -94,13 +88,13 @@ namespace Server
                         return false;
                     }
                 case UserGroup.SenzoriZvuka:
-                    if (messageForClients.ToLower().Equals("stop"))
+                    if (messageForClients.ToString().ToLower().Equals("stop"))
                     {
                         senzoriZvukaDatabaseOpen = true;
                         Console.WriteLine("[Zvuk]: OPEN");
                         return true;
                     }
-                    else if (messageForClients.ToLower().Equals("start"))
+                    else if (messageForClients.ToString().ToLower().Equals("start"))
                     {
                         if (senzoriZvukaDatabaseOpen)
                         {
@@ -171,6 +165,8 @@ namespace Server
             {
                 File.WriteAllText(activePath, message + Environment.NewLine);
             }
+
+            Console.WriteLine($"[{userGroup.ToString()}]: {message}");
         }
     }
 }
