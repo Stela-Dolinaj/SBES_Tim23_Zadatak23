@@ -48,6 +48,15 @@ namespace Client
             WCFClient2Client proxyC2C = new WCFClient2Client(binding, C2CEndpointAddress);
 
             #region SEND MESSAGE
+
+            // Digitalno potpisivanje start i stop poruka
+            string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+            X509Certificate2 signCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
+            
+            byte[] signStart = DigitalSignature.Create(ClientMessage.start.ToString(), HashAlgorithm.SHA1, signCert);
+            byte[] signStop = DigitalSignature.Create(ClientMessage.stop.ToString(), HashAlgorithm.SHA1, signCert);
+            byte[] signMessage;
+
             bool canStart;
             UserGroup myGroup = proxyC2C.myGroup;
 
@@ -57,12 +66,6 @@ namespace Client
                 if (Console.ReadLine().Equals("q"))
                     break;
 
-                // Digitalno potpisivanje start i stop poruka
-                string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
-                X509Certificate2 signCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
-                byte[] signStart = DigitalSignature.Create(ClientMessage.start.ToString(), HashAlgorithm.SHA1, signCert);
-                byte[] signStop = DigitalSignature.Create(ClientMessage.stop.ToString(), HashAlgorithm.SHA1, signCert);
-                byte[] signMessage;
                 canStart = proxyC2C.SendMessage(ClientMessage.start, signStart, proxyC2C.myGroup);
 
                 if (canStart)
