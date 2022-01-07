@@ -12,7 +12,7 @@ namespace Contracts
     public interface IClientCommunications
     {
         [OperationContract]
-        bool SendMessage(ClientMessage messageForClients, UserGroup clientGroup);
+        bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup);
 
         [OperationContract]
         void TestCommunication();

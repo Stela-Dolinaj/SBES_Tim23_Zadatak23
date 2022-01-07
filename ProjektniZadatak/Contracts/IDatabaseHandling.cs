@@ -12,7 +12,7 @@ namespace Contracts
     public interface IDatabaseHandling
     {
         [OperationContract]
-        void WriteToDatabase(string message, UserGroup userGroup);
+        void WriteToDatabase(string message, byte[] sign, UserGroup userGroup);
 
         [OperationContract]
         void TestCommunication();

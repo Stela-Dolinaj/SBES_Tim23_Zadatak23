@@ -57,7 +57,13 @@ namespace Client
                 if (Console.ReadLine().Equals("q"))
                     break;
 
-                canStart = proxyC2C.SendMessage(ClientMessage.start, proxyC2C.myGroup);
+                // Digitalno potpisivanje start i stop poruka
+                string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+                X509Certificate2 signCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
+                byte[] signStart = DigitalSignature.Create(ClientMessage.start.ToString(), HashAlgorithm.SHA1, signCert);
+                byte[] signStop = DigitalSignature.Create(ClientMessage.stop.ToString(), HashAlgorithm.SHA1, signCert);
+                byte[] signMessage;
+                canStart = proxyC2C.SendMessage(ClientMessage.start, signStart, proxyC2C.myGroup);
 
                 if (canStart)
                 {
@@ -66,12 +72,14 @@ namespace Client
                     Console.ReadLine();
 
                     string message = GenerateMeasurement(myGroup);
-                    // sign poruku
+
+                    // Digitalno potpisivanje poruke
+                    signMessage = DigitalSignature.Create(message, HashAlgorithm.SHA1, signCert);
 
                     Console.WriteLine(">> Sent message : " + message);
-                    proxyC2DB.WriteToDatabase(message, myGroup);
+                    proxyC2DB.WriteToDatabase(message, signMessage, myGroup);
 
-                    proxyC2C.SendMessage(ClientMessage.stop, myGroup);
+                    proxyC2C.SendMessage(ClientMessage.stop, signStop, myGroup);
                 }
                 else
                 {

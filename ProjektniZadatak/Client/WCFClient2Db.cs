@@ -36,11 +36,11 @@ namespace Client
             proxy = this.CreateChannel();
         }
 
-        public void WriteToDatabase(string message, UserGroup clientGroup)
+        public void WriteToDatabase(string message, byte[] sign, UserGroup clientGroup)
         {
             try
             {
-                proxy.WriteToDatabase(message, clientGroup);
+                proxy.WriteToDatabase(message, sign, clientGroup);
             }
             catch (Exception e)
             {

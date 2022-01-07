@@ -1,9 +1,12 @@
 ﻿using Contracts;
 using Contracts.Enums;
+using Manager;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,8 +28,17 @@ namespace Server
         ///     Zavrsi zauzimanje kanala i vrati true.
         /// </summary>
         /// <param name="messageForClients"></param>
-        public bool SendMessage(ClientMessage messageForClients, UserGroup clientGroup)
+        public bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup)
         {
+            // Provera digitalnog potpisa.
+            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
+            if (!DigitalSignature.Verify(messageForClients.ToString(), HashAlgorithm.SHA1, sign, certificate))
+            {
+                Console.WriteLine("[Client:SendMessage]>> Sign is invalid!");
+                throw new InvalidOperationException("Sign is invalid!");
+            }
+
             switch (clientGroup)
             {
                 case UserGroup.NULL:
@@ -129,8 +141,17 @@ namespace Server
         /// <param name="message">Formatirana poruka koju upisujem u DB</param>
         /// <param name="userGroup">Grupa kojoj korisnik pripada</param>
         /// <returns>true ako je uspela operacija, false u suprotnom slucaju</returns>
-        public void WriteToDatabase(string message, UserGroup userGroup)
+        public void WriteToDatabase(string message, byte[] sign, UserGroup userGroup)
         {
+            // Provera digitalnog potpisa
+            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
+            if (!DigitalSignature.Verify(message, HashAlgorithm.SHA1, sign, certificate))
+            {
+                Console.WriteLine("[Client:WriteToDatabase]>> Sign is invalid!");
+                throw new InvalidOperationException("Sign is invalid!");
+            }
+
             if (userGroup == UserGroup.NULL)
             {
                 throw new InvalidOperationException("User has no group.");

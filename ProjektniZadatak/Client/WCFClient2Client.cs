@@ -54,11 +54,11 @@ namespace Client
             }
         }
 
-        public bool SendMessage(ClientMessage messageForClients, UserGroup clientGroup)
+        public bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup)
         {
             try
             {
-                return proxy.SendMessage(messageForClients, clientGroup);
+                return proxy.SendMessage(messageForClients, sign, clientGroup);
             }
             catch (Exception e)
             {
