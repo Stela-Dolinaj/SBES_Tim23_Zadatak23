@@ -31,7 +31,7 @@ namespace Server
         public bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup)
         {
             // Provera digitalnog potpisa.
-            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
             if (!DigitalSignature.Verify(messageForClients.ToString(), HashAlgorithm.SHA1, sign, certificate))
             {
@@ -144,7 +144,7 @@ namespace Server
         public void WriteToDatabase(string message, byte[] sign, UserGroup userGroup)
         {
             // Provera digitalnog potpisa
-            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
             if (!DigitalSignature.Verify(message, HashAlgorithm.SHA1, sign, certificate))
             {
