@@ -12,6 +12,7 @@ using System.DirectoryServices.AccountManagement;
 using Contracts.Enums;
 using System.Diagnostics;
 using System.Threading;
+using SecurityManager;
 
 namespace Client
 {
@@ -22,6 +23,14 @@ namespace Client
             // pokreni visualstudio u admin modu da bi Debugger.Launch() radilo
             //Debugger.Launch();
 
+            //mene nesto interesuje, ovako log radi cisto da znate mozete ovo izbrisati
+            /*
+            EventLog eventLog = new EventLog("Application");
+            eventLog.Source = "Application";
+            eventLog.WriteEntry("Ako nusta barem ovo radi", EventLogEntryType.Information, 101, 1);
+            Console.WriteLine("Prosao log");
+            Console.ReadLine();
+            */
             // Serverski sertifikat
             string serverCertNC = "wcfservice";
 
@@ -60,47 +69,60 @@ namespace Client
 
             bool canStart;
             UserGroup myGroup = proxyC2C.myGroup;
-
             
+            Console.WriteLine("**********************************");
+            Console.WriteLine("Dear user your group is: "+myGroup);
+            Console.WriteLine("**********************************");
+            Console.WriteLine();
+
+            Console.ReadLine();
             while (true)
             {
+                
                 Console.WriteLine(">> Press [enter] to start sending. [q] - quit");
                 if (Console.ReadLine().Equals("q"))
                     break;
-                // Ovdje je poceo da puca ali zbog servera
-                Console.WriteLine("canStart = proxy...\n BREAK POINT ZERO");
-                Console.ReadLine();
-                //Prodje readline i pukne kod SendMessage(internal error)
+                
                 canStart = proxyC2C.SendMessage(ClientMessage.start, signStart);
+                
 
-                Console.WriteLine("canStart = proxy...\n BREAK POINT ZERO DAWN");
-                Console.ReadLine();
-         
-                if (canStart)
+                    if (canStart)
                 {
-                    
-                    Console.WriteLine("Usao u slanje\n BREAK POINT 1");
-                    Console.ReadLine();
-
-                    //proxyC2DB.ManagePermission(true, "Barometri", "one");
-                    //proxyC2DB.ManageRoles(true, "AllAccess");
-
-                    Console.WriteLine("Prosao slanje\n BREAK POINT 2");
-                    Console.ReadLine();
-                    
                     // Pauza da bi se dokazalo da drugi klijenti iste grupe u ovom momentu ne mogu da pristupe bazi podataka
                     Console.WriteLine(">> Ready to send message. Press [enter] to send.");
                     Console.ReadLine();
 
                     string message = GenerateMeasurement(myGroup);
-
+                    
+                    Console.WriteLine();
                     // Digitalno potpisivanje poruke
                     signMessage = DigitalSignature.Create(message, HashAlgorithm.SHA1, signCert);
 
                     Console.WriteLine(">> Sent message : " + message);
-                    proxyC2DB.WriteToDatabase(message, signMessage);
+                    //Dodaj da zna kome da salje
+                    switch(myGroup.ToString())
+                    {
+                        case "Barometri":
+                            proxyC2DB.WriteToPressureDb(message, signMessage);
 
-                    proxyC2C.SendMessage(ClientMessage.stop, signStop);
+                            proxyC2C.SendMessage(ClientMessage.stop, signStop);
+                            break;
+                        case "SenzoriZvuka":
+                            proxyC2DB.WriteToSoundDb(message, signMessage);
+
+                            proxyC2C.SendMessage(ClientMessage.stop, signStop);
+                            break;
+                        case "SenzoriTemperature":
+                            proxyC2DB.WriteToSoundDb(message, signMessage);
+
+                            proxyC2C.SendMessage(ClientMessage.stop, signStop);
+                            break;
+                        default:
+                            Console.WriteLine("User and group unknown");
+                            break;
+
+                    }
+                    
                 }
                 else
                 {

@@ -35,11 +35,11 @@ namespace Client
 
             proxy = this.CreateChannel();
         }
-        public void WriteToDatabase(string message, byte[] sign)
+        public void WriteToTempDb(string message, byte[] sign)
         {
             try
             {
-                proxy.WriteToDatabase(message, sign);
+                proxy.WriteToTempDb(message, sign);
             }
             catch (Exception e)
             {
@@ -52,6 +52,30 @@ namespace Client
             try
             {
                 proxy.TestCommunication();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[ERROR]: " + e.Message);
+            }
+        }
+
+        public void WriteToPressureDb(string message, byte[] sign)
+        {
+            try
+            {
+                proxy.WriteToPressureDb(message, sign);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[ERROR]: " + e.Message);
+            }
+        }
+
+        public void WriteToSoundDb(string message, byte[] sign)
+        {
+            try
+            {
+                proxy.WriteToSoundDb(message, sign);
             }
             catch (Exception e)
             {

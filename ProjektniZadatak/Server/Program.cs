@@ -52,25 +52,15 @@ namespace Server
             host.Credentials.ServiceCertificate.Certificate =
                 CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, serviceCertCN);
 
-            /*////////////////////////////////////////////*/
-            //Ovaj dio zakomentarisati da bi radilo ali bez autorizacije
-            //Ovdje pravi gresku
-            host.Authorization.ServiceAuthorizationManager = new CustomAuthorizationManager();
-
-            // podesavamo custom polisu, odnosno nas objekat principala
-            host.Authorization.PrincipalPermissionMode = PrincipalPermissionMode.Custom;
-            List<IAuthorizationPolicy> policies = new List<IAuthorizationPolicy>();
-            policies.Add(new CustomAuthorizationPolicy());
-            host.Authorization.ExternalAuthorizationPolicies = policies.AsReadOnly();
-
-            /*////////////////////////////////////////////*/
+            
+            /*
             //Auditing
             ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
             newAudit.AuditLogLocation = AuditLogLocation.Application;
             newAudit.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
 
             host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            host.Description.Behaviors.Add(newAudit);
+            host.Description.Behaviors.Add(newAudit);*/
 
             try
             {

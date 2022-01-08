@@ -4,6 +4,7 @@ using Manager;
 using SecurityManager;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -12,7 +13,6 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 namespace Server
 {
     public class DatabaseHandlingService : IDatabaseHandling, IClientCommunications
@@ -20,7 +20,8 @@ namespace Server
         private static bool barometriDatabaseOpen = true;
         private static bool senzoriTemperatureDatabaseOpen = true;
         private static bool senzoriZvukaDatabaseOpen = true;
-
+        EventLog eventLog = new EventLog("Application");
+        
         /// <summary>
         /// Stize poruka na servis.
         /// Analiziraj poruku:
@@ -48,8 +49,19 @@ namespace Server
             UserGroup clientGroup = CertManager.GetMyGroupFromCert(certificate);
             if (!RolesConfig.IsInRole(clientGroup.ToString(), "SendMessage"))
             {
-                // Ako izbaci uradi nesto
-                // Logger.Write()
+                Console.WriteLine("User doesn't have perrmision to use function SendMessage");
+                //Dodat log
+                eventLog.Source = "Application";
+                eventLog.WriteEntry("Client has been denied access to SendMessage function", EventLogEntryType.Information, 101, 1);
+                throw new InvalidOperationException("Access denied!");
+            }
+            else
+            {
+                
+               
+                Console.WriteLine("Client {0} from group {1} has been authorised to use function SendMessage",clientName,clientGroup);
+                eventLog.Source = "Application";
+                eventLog.WriteEntry("Client has been granted access to SendMessage function", EventLogEntryType.Information, 101, 1);
             }
 
             switch (clientGroup)
@@ -170,12 +182,22 @@ namespace Server
 
             // Autorizacija
             UserGroup clientGroup = CertManager.GetMyGroupFromCert(certificate);
-            if (!RolesConfig.IsInRole(clientGroup.ToString(), "SendMessage"))
+            if (!RolesConfig.IsInRole(clientGroup.ToString(), "WriteToPressureDb"))
             {
-                // Ako izbaci uradi nesto
+                Console.WriteLine("User doesn't have perrmision to write to the DataBase");
+                //Dodat log
+                eventLog.Source = "Application";
+                eventLog.WriteEntry("Client has been denied access", EventLogEntryType.Information, 101, 1);
+                throw new InvalidOperationException("Access denied!");
+            }
+            else
+            {
+                Console.WriteLine("Client {0} from group {1} has been authorised to use function WriteToPressureDb",clientName ,clientGroup);
+                eventLog.Source = "Application";
+                eventLog.WriteEntry("Client has been granted access", EventLogEntryType.Information, 101, 1);
             }
 
-            if (userGroup == UserGroup.NULL)
+            if (clientGroup == UserGroup.NULL)
             {
                 throw new InvalidOperationException("User has no group.");
             }
@@ -184,22 +206,15 @@ namespace Server
                 { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
 
             string activePath;
-
-            switch (userGroup)
+            if (clientGroup.ToString() == "Barometri")
             {
-                case UserGroup.Barometri:
-                    activePath = dataBasePaths[0];
-                    break;
-                case UserGroup.SenzoriTemperature:
-                    activePath = dataBasePaths[1];
-                    break;
-                case UserGroup.SenzoriZvuka:
-                    activePath = dataBasePaths[2];
-                    break;
-                default:
-                    activePath = dataBasePaths[0];
-                    break;
+                activePath = dataBasePaths[1];
             }
+            else
+            {
+                activePath = dataBasePaths[0];
+            }
+
 
             if (File.Exists(activePath))
             {
@@ -210,7 +225,7 @@ namespace Server
                 File.WriteAllText(activePath, message + Environment.NewLine);
             }
 
-            Console.WriteLine($"[{userGroup.ToString()}]: {message}");
+            Console.WriteLine($"[{clientGroup.ToString()}]: {message}");
         }
 
         public void WriteToSoundDb(string message, byte[] sign)
@@ -226,12 +241,22 @@ namespace Server
 
             // Autorizacija
             UserGroup clientGroup = CertManager.GetMyGroupFromCert(certificate);
-            if (!RolesConfig.IsInRole(clientGroup.ToString(), "SendMessage"))
+            if (!RolesConfig.IsInRole(clientGroup.ToString(), "WriteToSoundDb"))
             {
-                // Ako izbaci uradi nesto
+                Console.WriteLine("User doesn't have perrmision to write to the DataBase");
+                //Dodat log
+                eventLog.Source = "Application";
+                eventLog.WriteEntry("Client has been denied access", EventLogEntryType.Information, 101, 1);
+                throw new InvalidOperationException("Access denied!");
+            }
+            else
+            {
+                Console.WriteLine("Client {0} from group {1} has been authorised to use function WriteToSoundDb", clientName, clientGroup);
+                eventLog.Source = "Application";
+                eventLog.WriteEntry("Client has been granted access", EventLogEntryType.Information, 101, 1);
             }
 
-            if (userGroup == UserGroup.NULL)
+            if (clientGroup == UserGroup.NULL)
             {
                 throw new InvalidOperationException("User has no group.");
             }
@@ -240,22 +265,15 @@ namespace Server
                 { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
 
             string activePath;
-
-            switch (userGroup)
+            if (clientGroup.ToString() == "SenzoriZvuka")
             {
-                case UserGroup.Barometri:
-                    activePath = dataBasePaths[0];
-                    break;
-                case UserGroup.SenzoriTemperature:
-                    activePath = dataBasePaths[1];
-                    break;
-                case UserGroup.SenzoriZvuka:
-                    activePath = dataBasePaths[2];
-                    break;
-                default:
-                    activePath = dataBasePaths[0];
-                    break;
+                activePath = dataBasePaths[2];
             }
+            else
+            {
+                activePath = dataBasePaths[0];
+            }
+
 
             if (File.Exists(activePath))
             {
@@ -266,7 +284,7 @@ namespace Server
                 File.WriteAllText(activePath, message + Environment.NewLine);
             }
 
-            Console.WriteLine($"[{userGroup.ToString()}]: {message}");
+            Console.WriteLine($"[{clientGroup.ToString()}]: {message}");
         }
 
         public void WriteToTempDb(string message, byte[] sign)
@@ -282,12 +300,22 @@ namespace Server
 
             // Autorizacija
             UserGroup clientGroup = CertManager.GetMyGroupFromCert(certificate);
-            if (!RolesConfig.IsInRole(clientGroup.ToString(), "SendMessage"))
+            if (!RolesConfig.IsInRole(clientGroup.ToString(), "WriteToTempDb"))
             {
-                // Ako izbaci uradi nesto
+                Console.WriteLine("User doesn't have perrmision to write to the DataBase");
+                //Dodat log
+                eventLog.Source = "Application";
+                eventLog.WriteEntry("Client has been denied access", EventLogEntryType.Information, 101, 1);
+                throw new InvalidOperationException("Access denied!");
+            }
+            else
+            {
+                Console.WriteLine("Client {0} from group {1} has been authorised to use function WriteToTempDb", clientName, clientGroup);
+                eventLog.Source = "Application";
+                eventLog.WriteEntry("Client has been granted access", EventLogEntryType.Information, 101, 1);
             }
 
-            if (userGroup == UserGroup.NULL)
+            if (clientGroup == UserGroup.NULL)
             {
                 throw new InvalidOperationException("User has no group.");
             }
@@ -296,22 +324,15 @@ namespace Server
                 { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
 
             string activePath;
-
-            switch (userGroup)
+            if(clientGroup.ToString() == "SenzoriTemperature")
             {
-                case UserGroup.Barometri:
-                    activePath = dataBasePaths[0];
-                    break;
-                case UserGroup.SenzoriTemperature:
-                    activePath = dataBasePaths[1];
-                    break;
-                case UserGroup.SenzoriZvuka:
-                    activePath = dataBasePaths[2];
-                    break;
-                default:
-                    activePath = dataBasePaths[0];
-                    break;
+                activePath = dataBasePaths[1];
             }
+            else
+            {
+                activePath = dataBasePaths[0];
+            }
+            
 
             if (File.Exists(activePath))
             {
@@ -322,7 +343,7 @@ namespace Server
                 File.WriteAllText(activePath, message + Environment.NewLine);
             }
 
-            Console.WriteLine($"[{userGroup.ToString()}]: {message}");
+            Console.WriteLine($"[{clientGroup.ToString()}]: {message}");
         }
     }
 }
