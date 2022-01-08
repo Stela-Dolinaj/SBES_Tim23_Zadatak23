@@ -32,9 +32,9 @@ namespace Server
         /// <param name="messageForClients"></param>
         ///
         
-        /*[PrincipalPermission(SecurityAction.Demand, Role = "Barometri")]
+        [PrincipalPermission(SecurityAction.Demand, Role = "Barometar")]
         [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriZvuka")]
-        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriTemperature")]*/
+        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriTemperature")]
         public bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup)
         {
             // Provera digitalnog potpisa.
