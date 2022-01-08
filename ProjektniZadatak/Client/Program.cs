@@ -53,6 +53,7 @@ namespace Client
             string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
             X509Certificate2 signCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
             
+
             byte[] signStart = DigitalSignature.Create(ClientMessage.start.ToString(), HashAlgorithm.SHA1, signCert);
             byte[] signStop = DigitalSignature.Create(ClientMessage.stop.ToString(), HashAlgorithm.SHA1, signCert);
             byte[] signMessage;
@@ -60,6 +61,7 @@ namespace Client
             bool canStart;
             UserGroup myGroup = proxyC2C.myGroup;
 
+            
             while (true)
             {
                 Console.WriteLine(">> Press [enter] to start sending. [q] - quit");
@@ -68,6 +70,11 @@ namespace Client
 
                 canStart = proxyC2C.SendMessage(ClientMessage.start, signStart, proxyC2C.myGroup);
 
+                // Puca ovdje
+                /*proxyC2DB.ManagePermission(true, "AllAccess", "one");
+                proxyC2DB.ManagePermission(false, "AllAccess", "one"); ;
+                proxyC2DB.ManageRoles(true, "None");
+                proxyC2DB.ManageRoles(false, "None");*/
                 if (canStart)
                 {
                     // Pauza da bi se dokazalo da drugi klijenti iste grupe u ovom momentu ne mogu da pristupe bazi podataka

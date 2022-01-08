@@ -1,8 +1,10 @@
 ﻿using Contracts;
 using Manager;
+using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IdentityModel.Policy;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -52,6 +54,11 @@ namespace Server
             // Potencijalno resenje autorizacije
             //host.Authorization.ServiceAuthorizationManager = new MyAuthorizationManager();
 
+            // podesavamo custom polisu, odnosno nas objekat principala
+            host.Authorization.PrincipalPermissionMode = PrincipalPermissionMode.Custom;
+            List<IAuthorizationPolicy> policies = new List<IAuthorizationPolicy>();
+            policies.Add(new CustomAuthorizationPolicy());
+            host.Authorization.ExternalAuthorizationPolicies = policies.AsReadOnly();
             //Auditing
             ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
             newAudit.AuditLogLocation = AuditLogLocation.Application;

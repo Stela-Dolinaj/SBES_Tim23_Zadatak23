@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Contracts.Enums;
 using Manager;
+using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,10 +32,8 @@ namespace Server
         /// </summary>
         /// <param name="messageForClients"></param>
         ///
-        
-        [PrincipalPermission(SecurityAction.Demand, Role = "Barometar")]
-        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriZvuka")]
-        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriTemperature")]
+
+        [PrincipalPermission(SecurityAction.Demand, Role = "AllAccess")]
         public bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup)
         {
             // Provera digitalnog potpisa.
@@ -140,7 +139,36 @@ namespace Server
         {
             Console.WriteLine("[Client:TestCommunication]>> Test success!");
         }
+        /**********************************************/
+          
+        public void ManagePermission(bool isAdd, string rolename, params string[] permissions)
+        {
+            if (isAdd) // u pitanju je dodavanje
+            {
+                RolesConfig.AddPermissions(rolename, permissions);
+            }
+            else // u pitanju je brisanje
+            {
+                RolesConfig.RemovePermissions(rolename, permissions);
+            }
+        }
 
+        //[PrincipalPermission(SecurityAction.Demand, Role = "permisija")]
+        public void ManageRoles(bool isAdd, string rolename)
+        {
+            if (isAdd) // u pitanju je dodavanje
+            {
+                RolesConfig.AddRole(rolename);
+            }
+            else // u pitanju je brisanje
+            {
+                RolesConfig.RemoveRole(rolename);
+            }
+        }
+
+
+         
+         /* /////////////////////////*/
 
         /// <summary>
         /// Upis u DB
@@ -150,9 +178,9 @@ namespace Server
         /// <returns>true ako je uspela operacija, false u suprotnom slucaju</returns>
         /// 
 
-       /* [PrincipalPermission(SecurityAction.Demand, Role = "Barometri")]     
-        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriZvuka")]
-        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriTemperature")]*/
+        /* [PrincipalPermission(SecurityAction.Demand, Role = "Barometri")]     
+         [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriZvuka")]
+         [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriTemperature")]*/
         public void WriteToDatabase(string message, byte[] sign, UserGroup userGroup)
         {
             // Provera digitalnog potpisa
