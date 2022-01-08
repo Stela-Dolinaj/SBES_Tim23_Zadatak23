@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Permissions;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server
@@ -28,6 +30,11 @@ namespace Server
         ///     Zavrsi zauzimanje kanala i vrati true.
         /// </summary>
         /// <param name="messageForClients"></param>
+        ///
+        
+        /*[PrincipalPermission(SecurityAction.Demand, Role = "Barometri")]
+        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriZvuka")]
+        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriTemperature")]*/
         public bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup)
         {
             // Provera digitalnog potpisa.
@@ -141,6 +148,11 @@ namespace Server
         /// <param name="message">Formatirana poruka koju upisujem u DB</param>
         /// <param name="userGroup">Grupa kojoj korisnik pripada</param>
         /// <returns>true ako je uspela operacija, false u suprotnom slucaju</returns>
+        /// 
+
+       /* [PrincipalPermission(SecurityAction.Demand, Role = "Barometri")]     
+        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriZvuka")]
+        [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriTemperature")]*/
         public void WriteToDatabase(string message, byte[] sign, UserGroup userGroup)
         {
             // Provera digitalnog potpisa
