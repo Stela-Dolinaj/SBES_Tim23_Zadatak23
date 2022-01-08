@@ -35,36 +35,11 @@ namespace Client
 
             proxy = this.CreateChannel();
         }
-        public void ManagePermission(bool isAdd, string rolename, params string[] permissions)
+        public void WriteToDatabase(string message, byte[] sign)
         {
             try
             {
-                proxy.ManagePermission(isAdd, rolename, permissions);
-                Console.WriteLine("Manage allowed");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error while trying to Manage : {0}", e.Message);
-            }
-        }
-
-        public void ManageRoles(bool isAdd, string rolename)
-        {
-            try
-            {
-                proxy.ManageRoles(isAdd, rolename);
-                Console.WriteLine("Manage allowed");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error while trying to Manage : {0}", e.Message);
-            }
-        }
-        public void WriteToDatabase(string message, byte[] sign, UserGroup clientGroup)
-        {
-            try
-            {
-                proxy.WriteToDatabase(message, sign, clientGroup);
+                proxy.WriteToDatabase(message, sign);
             }
             catch (Exception e)
             {

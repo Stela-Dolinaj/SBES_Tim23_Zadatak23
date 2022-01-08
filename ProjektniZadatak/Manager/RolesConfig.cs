@@ -30,6 +30,21 @@ namespace SecurityManager
 
         }
 
+        public static bool IsInRole(string groupName, string permission)
+        {
+            string[] permissions;
+            GetPermissions(groupName, out permissions);
+            foreach (string perm in permissions)
+            {
+                if (perm.Equals(permission))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static void AddPermissions(string rolename, string[] permissions)
         {
             string permissionString = string.Empty;

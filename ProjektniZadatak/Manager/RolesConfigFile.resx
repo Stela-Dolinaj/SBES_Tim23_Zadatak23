@@ -118,12 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Barometri" xml:space="preserve">
-    <value>Read,Write,GETTO,AllAccess</value>
+    <value>SendMessage,WriteToPressureDb</value>
   </data>
   <data name="SenzoriTemperature" xml:space="preserve">
-    <value>Read,Write,GETTO,AllAccess</value>
+    <value>SendMessage,WriteToTempDb</value>
   </data>
   <data name="SenzoriZvuka" xml:space="preserve">
-    <value>Read,Write,GETTO,AllAccess</value>
+    <value>SendMessage,WriteToSoundDb</value>
   </data>
 </root>

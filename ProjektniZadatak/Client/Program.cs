@@ -71,7 +71,7 @@ namespace Client
                 Console.WriteLine("canStart = proxy...\n BREAK POINT ZERO");
                 Console.ReadLine();
                 //Prodje readline i pukne kod SendMessage(internal error)
-                canStart = proxyC2C.SendMessage(ClientMessage.start, signStart, proxyC2C.myGroup);
+                canStart = proxyC2C.SendMessage(ClientMessage.start, signStart);
 
                 Console.WriteLine("canStart = proxy...\n BREAK POINT ZERO DAWN");
                 Console.ReadLine();
@@ -98,9 +98,9 @@ namespace Client
                     signMessage = DigitalSignature.Create(message, HashAlgorithm.SHA1, signCert);
 
                     Console.WriteLine(">> Sent message : " + message);
-                    proxyC2DB.WriteToDatabase(message, signMessage, myGroup);
+                    proxyC2DB.WriteToDatabase(message, signMessage);
 
-                    proxyC2C.SendMessage(ClientMessage.stop, signStop, myGroup);
+                    proxyC2C.SendMessage(ClientMessage.stop, signStop);
                 }
                 else
                 {

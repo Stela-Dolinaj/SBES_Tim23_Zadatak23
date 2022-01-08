@@ -12,15 +12,16 @@ namespace Contracts
     public interface IDatabaseHandling
     {
         [OperationContract]
-        void WriteToDatabase(string message, byte[] sign, UserGroup userGroup);
+        void WriteToTempDb(string message, byte[] sign);
+
+        [OperationContract]
+        void WriteToPressureDb(string message, byte[] sign);
+
+        [OperationContract]
+        void WriteToSoundDb(string message, byte[] sign);
 
         [OperationContract]
         void TestCommunication();
 
-        [OperationContract]
-        void ManagePermission(bool isAdd, string rolename, params string[] permissions);
-
-        [OperationContract]
-        void ManageRoles(bool isAdd, string rolename);
     }
 }

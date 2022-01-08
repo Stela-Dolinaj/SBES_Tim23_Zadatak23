@@ -33,8 +33,7 @@ namespace Server
         /// <param name="messageForClients"></param>
         ///
 
-        [PrincipalPermission(SecurityAction.Demand, Role = "GETTO")]
-        public bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup)
+        public bool SendMessage(ClientMessage messageForClients, byte[] sign)
         {
             // Provera digitalnog potpisa.
             string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
@@ -43,6 +42,14 @@ namespace Server
             {
                 Console.WriteLine("[Client:SendMessage]>> Sign is invalid!");
                 throw new InvalidOperationException("Sign is invalid!");
+            }
+
+            // Autorizacija
+            UserGroup clientGroup = CertManager.GetMyGroupFromCert(certificate);
+            if (!RolesConfig.IsInRole(clientGroup.ToString(), "SendMessage"))
+            {
+                // Ako izbaci uradi nesto
+                // Logger.Write()
             }
 
             switch (clientGroup)
@@ -142,37 +149,6 @@ namespace Server
 
 
         /*////////////////////////////////////////////////////*/
-        //Metode za autorizaciju
-        
-        [PrincipalPermission(SecurityAction.Demand, Role = "AllAccess")]
-        public void ManagePermission(bool isAdd, string rolename, params string[] permissions)
-        {
-            if (isAdd) // u pitanju je dodavanje
-            {
-                RolesConfig.AddPermissions(rolename, permissions);
-            }
-            else // u pitanju je brisanje
-            {
-                RolesConfig.RemovePermissions(rolename, permissions);
-            }
-        }
-
-        [PrincipalPermission(SecurityAction.Demand, Role = "AllAccess")]
-        public void ManageRoles(bool isAdd, string rolename)
-        {
-            if (isAdd) // u pitanju je dodavanje
-            {
-                RolesConfig.AddRole(rolename);
-            }
-            else // u pitanju je brisanje
-            {
-                RolesConfig.RemoveRole(rolename);
-            }
-        }
-
-
-
-        /*////////////////////////////////////////////////////*/
 
         /// <summary>
         /// Upis u DB
@@ -181,8 +157,7 @@ namespace Server
         /// <param name="userGroup">Grupa kojoj korisnik pripada</param>
         /// <returns>true ako je uspela operacija, false u suprotnom slucaju</returns>
  
-        [PrincipalPermission(SecurityAction.Demand, Role = "Write")]
-        public void WriteToDatabase(string message, byte[] sign, UserGroup userGroup)
+        public void WriteToPressureDb(string message, byte[] sign)
         {
             // Provera digitalnog potpisa
             string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
@@ -191,6 +166,125 @@ namespace Server
             {
                 Console.WriteLine("[Client:WriteToDatabase]>> Sign is invalid!");
                 throw new InvalidOperationException("Sign is invalid!");
+            }
+
+            // Autorizacija
+            UserGroup clientGroup = CertManager.GetMyGroupFromCert(certificate);
+            if (!RolesConfig.IsInRole(clientGroup.ToString(), "SendMessage"))
+            {
+                // Ako izbaci uradi nesto
+            }
+
+            if (userGroup == UserGroup.NULL)
+            {
+                throw new InvalidOperationException("User has no group.");
+            }
+
+            string[] dataBasePaths =
+                { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
+
+            string activePath;
+
+            switch (userGroup)
+            {
+                case UserGroup.Barometri:
+                    activePath = dataBasePaths[0];
+                    break;
+                case UserGroup.SenzoriTemperature:
+                    activePath = dataBasePaths[1];
+                    break;
+                case UserGroup.SenzoriZvuka:
+                    activePath = dataBasePaths[2];
+                    break;
+                default:
+                    activePath = dataBasePaths[0];
+                    break;
+            }
+
+            if (File.Exists(activePath))
+            {
+                File.AppendAllText(activePath, message + Environment.NewLine);
+            }
+            else
+            {
+                File.WriteAllText(activePath, message + Environment.NewLine);
+            }
+
+            Console.WriteLine($"[{userGroup.ToString()}]: {message}");
+        }
+
+        public void WriteToSoundDb(string message, byte[] sign)
+        {
+            // Provera digitalnog potpisa
+            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
+            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
+            if (!DigitalSignature.Verify(message, HashAlgorithm.SHA1, sign, certificate))
+            {
+                Console.WriteLine("[Client:WriteToDatabase]>> Sign is invalid!");
+                throw new InvalidOperationException("Sign is invalid!");
+            }
+
+            // Autorizacija
+            UserGroup clientGroup = CertManager.GetMyGroupFromCert(certificate);
+            if (!RolesConfig.IsInRole(clientGroup.ToString(), "SendMessage"))
+            {
+                // Ako izbaci uradi nesto
+            }
+
+            if (userGroup == UserGroup.NULL)
+            {
+                throw new InvalidOperationException("User has no group.");
+            }
+
+            string[] dataBasePaths =
+                { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
+
+            string activePath;
+
+            switch (userGroup)
+            {
+                case UserGroup.Barometri:
+                    activePath = dataBasePaths[0];
+                    break;
+                case UserGroup.SenzoriTemperature:
+                    activePath = dataBasePaths[1];
+                    break;
+                case UserGroup.SenzoriZvuka:
+                    activePath = dataBasePaths[2];
+                    break;
+                default:
+                    activePath = dataBasePaths[0];
+                    break;
+            }
+
+            if (File.Exists(activePath))
+            {
+                File.AppendAllText(activePath, message + Environment.NewLine);
+            }
+            else
+            {
+                File.WriteAllText(activePath, message + Environment.NewLine);
+            }
+
+            Console.WriteLine($"[{userGroup.ToString()}]: {message}");
+        }
+
+        public void WriteToTempDb(string message, byte[] sign)
+        {
+            // Provera digitalnog potpisa
+            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
+            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
+            if (!DigitalSignature.Verify(message, HashAlgorithm.SHA1, sign, certificate))
+            {
+                Console.WriteLine("[Client:WriteToDatabase]>> Sign is invalid!");
+                throw new InvalidOperationException("Sign is invalid!");
+            }
+
+            // Autorizacija
+            UserGroup clientGroup = CertManager.GetMyGroupFromCert(certificate);
+            if (!RolesConfig.IsInRole(clientGroup.ToString(), "SendMessage"))
+            {
+                // Ako izbaci uradi nesto
             }
 
             if (userGroup == UserGroup.NULL)
