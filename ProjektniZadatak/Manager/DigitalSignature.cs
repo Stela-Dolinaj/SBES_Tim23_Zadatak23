@@ -19,9 +19,7 @@ namespace Manager
 		/// <returns> byte array representing a digital signature for the given message </returns>
 		public static byte[] Create(string message, HashAlgorithm hashAlgorithm, X509Certificate2 certificate)
 		{
-            //TO DO
-
-            /// Looks for the certificate's private key to sign a message
+            // Nadje privatni kljuc sertifikata da bi potpisao poruku
             RSACryptoServiceProvider csp = certificate.PrivateKey as RSACryptoServiceProvider;
 
             if (csp == null)
@@ -29,23 +27,15 @@ namespace Manager
                 throw new Exception("Valid certificate not found");
             }
 
+            // Prevodjenje poruke u niz bajtova
             UnicodeEncoding encoding = new UnicodeEncoding();
             byte[] messageByte = encoding.GetBytes(message);
 
-            /// Use RSACryptoServiceProvider support to create a signature using a previously created hash value
-            byte[] hash = null;
-            if (HashAlgorithm.SHA1 == hashAlgorithm)
-            {
-                SHA1Managed sha1 = new SHA1Managed();
-                hash = sha1.ComputeHash(messageByte);
-            }
-            else if (hashAlgorithm == HashAlgorithm.SHA256)
-            {
-                SHA256Managed sha256 = new SHA256Managed();
-                hash = sha256.ComputeHash(messageByte);
-            }
+            // Pravljenje hash-ovane poruke uz pomoc SHA1Managed klase
+            SHA1Managed sha1 = new SHA1Managed();
+            byte[] hash = sha1.ComputeHash(messageByte);
 
-
+            // RSACryptoServiceProvider klasa pravi digitalno potpisanu poruku uz pomoc hash-ovane poruke
             byte[] signature = csp.SignHash(hash, CryptoConfig.MapNameToOID(hashAlgorithm.ToString()));           
 
             return signature;
@@ -54,27 +44,23 @@ namespace Manager
 
 		public static bool Verify(string message, HashAlgorithm hashAlgorithm, byte[] signature, X509Certificate2 certificate)
 		{
-            //TO DO
-
-            /// Looks for the certificate's public key to sign a message
+            // Nadje javni kljuc sertifikata da bi potpisao poruku
             RSACryptoServiceProvider csp = certificate.PublicKey.Key as RSACryptoServiceProvider;
 
+            if (csp == null)
+            {
+                throw new Exception("Valid certificate not found");
+            }
+
+            // Prevodjenje poruke u niz bajtova
             UnicodeEncoding encoding = new UnicodeEncoding();
             byte[] messageByte = encoding.GetBytes(message);
 
-            byte[] hash = null;
-            if (HashAlgorithm.SHA1 == hashAlgorithm)
-            {
-                SHA1Managed sha1 = new SHA1Managed();
-                hash = sha1.ComputeHash(messageByte);
-            }
-            else if (hashAlgorithm == HashAlgorithm.SHA256)
-            {
-                SHA256Managed sha256 = new SHA256Managed();
-                hash = sha256.ComputeHash(messageByte);
-            }
+            // Pravljenje hash-ovane poruke uz pomoc SHA1Managed klase
+            SHA1Managed sha1 = new SHA1Managed();
+            byte[] hash = sha1.ComputeHash(messageByte);
 
-            /// Use RSACryptoServiceProvider support to compare two - hash value from signature and newly created hash value
+            // RSACryptoServiceProvider klasa poredi digitalno potpisanu poruku i novokreiranu hash-ovanu poruku (nakon sto je potpise)
             return csp.VerifyHash(hash, CryptoConfig.MapNameToOID(hashAlgorithm.ToString()), signature);
         }
 	}
