@@ -13,7 +13,8 @@ namespace SecurityManager
 {
     public class RolesConfig
     {
-        static string path = @"~\..\..\..\..\Manager\RolesConfigFile.resx";
+        //Treba promeniti u zavisnosti od lokacije na lokalnoj masini
+        static string path = @"D:\RepoV1\SBES_Tim23_Zadatak23\ProjektniZadatak\RolesConfigFile.resx";
         public static bool GetPermissions(string rolename, out string[] permissions)
         {
             permissions = new string[10];

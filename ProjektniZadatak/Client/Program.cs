@@ -67,16 +67,27 @@ namespace Client
                 Console.WriteLine(">> Press [enter] to start sending. [q] - quit");
                 if (Console.ReadLine().Equals("q"))
                     break;
-
+                // Ovdje je poceo da puca ali zbog servera
+                Console.WriteLine("canStart = proxy...\n BREAK POINT ZERO");
+                Console.ReadLine();
+                //Prodje readline i pukne kod SendMessage(internal error)
                 canStart = proxyC2C.SendMessage(ClientMessage.start, signStart, proxyC2C.myGroup);
 
-                // Puca ovdje
-                /*proxyC2DB.ManagePermission(true, "AllAccess", "one");
-                proxyC2DB.ManagePermission(false, "AllAccess", "one"); ;
-                proxyC2DB.ManageRoles(true, "None");
-                proxyC2DB.ManageRoles(false, "None");*/
+                Console.WriteLine("canStart = proxy...\n BREAK POINT ZERO DAWN");
+                Console.ReadLine();
+         
                 if (canStart)
                 {
+                    
+                    Console.WriteLine("Usao u slanje\n BREAK POINT 1");
+                    Console.ReadLine();
+
+                    //proxyC2DB.ManagePermission(true, "Barometri", "one");
+                    //proxyC2DB.ManageRoles(true, "AllAccess");
+
+                    Console.WriteLine("Prosao slanje\n BREAK POINT 2");
+                    Console.ReadLine();
+                    
                     // Pauza da bi se dokazalo da drugi klijenti iste grupe u ovom momentu ne mogu da pristupe bazi podataka
                     Console.WriteLine(">> Ready to send message. Press [enter] to send.");
                     Console.ReadLine();

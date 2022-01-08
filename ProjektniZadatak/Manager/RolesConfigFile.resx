@@ -117,13 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Barometari" xml:space="preserve">
-    <value>AllAccess</value>
+  <data name="Barometri" xml:space="preserve">
+    <value>Read,Write,GETTO,AllAccess</value>
   </data>
-  <data name="SenzorTemperatue" xml:space="preserve">
-    <value>AllAccess</value>
+  <data name="SenzoriTemperature" xml:space="preserve">
+    <value>Read,Write,GETTO,AllAccess</value>
   </data>
-  <data name="SenzorZvuka" xml:space="preserve">
-    <value>AllAccess</value>
+  <data name="SenzoriZvuka" xml:space="preserve">
+    <value>Read,Write,GETTO,AllAccess</value>
   </data>
 </root>

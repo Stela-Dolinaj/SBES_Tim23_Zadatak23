@@ -14,7 +14,7 @@ namespace Server
         {
             WindowsIdentity identity = operationContext.ServiceSecurityContext.WindowsIdentity;
             WindowsPrincipal principal = new WindowsPrincipal(identity);
-            return principal.IsInRole("Barometri");
+            return principal.IsInRole("Read");
         }
     }
 }

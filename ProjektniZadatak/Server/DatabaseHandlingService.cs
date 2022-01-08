@@ -33,7 +33,7 @@ namespace Server
         /// <param name="messageForClients"></param>
         ///
 
-        [PrincipalPermission(SecurityAction.Demand, Role = "AllAccess")]
+        [PrincipalPermission(SecurityAction.Demand, Role = "GETTO")]
         public bool SendMessage(ClientMessage messageForClients, byte[] sign, UserGroup clientGroup)
         {
             // Provera digitalnog potpisa.
@@ -139,8 +139,12 @@ namespace Server
         {
             Console.WriteLine("[Client:TestCommunication]>> Test success!");
         }
-        /**********************************************/
-          
+
+
+        /*////////////////////////////////////////////////////*/
+        //Metode za autorizaciju
+        
+        [PrincipalPermission(SecurityAction.Demand, Role = "AllAccess")]
         public void ManagePermission(bool isAdd, string rolename, params string[] permissions)
         {
             if (isAdd) // u pitanju je dodavanje
@@ -153,7 +157,7 @@ namespace Server
             }
         }
 
-        //[PrincipalPermission(SecurityAction.Demand, Role = "permisija")]
+        [PrincipalPermission(SecurityAction.Demand, Role = "AllAccess")]
         public void ManageRoles(bool isAdd, string rolename)
         {
             if (isAdd) // u pitanju je dodavanje
@@ -167,8 +171,8 @@ namespace Server
         }
 
 
-         
-         /* /////////////////////////*/
+
+        /*////////////////////////////////////////////////////*/
 
         /// <summary>
         /// Upis u DB
@@ -176,11 +180,8 @@ namespace Server
         /// <param name="message">Formatirana poruka koju upisujem u DB</param>
         /// <param name="userGroup">Grupa kojoj korisnik pripada</param>
         /// <returns>true ako je uspela operacija, false u suprotnom slucaju</returns>
-        /// 
-
-        /* [PrincipalPermission(SecurityAction.Demand, Role = "Barometri")]     
-         [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriZvuka")]
-         [PrincipalPermission(SecurityAction.Demand, Role = "SenzoriTemperature")]*/
+ 
+        [PrincipalPermission(SecurityAction.Demand, Role = "Write")]
         public void WriteToDatabase(string message, byte[] sign, UserGroup userGroup)
         {
             // Provera digitalnog potpisa
