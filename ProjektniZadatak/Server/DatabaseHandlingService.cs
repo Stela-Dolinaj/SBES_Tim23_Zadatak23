@@ -244,7 +244,7 @@ namespace Server
             }
 
             // Uvek pisemo u barometri.txt posto je ova metoda samo za upis u tu datotetku
-            string activePath = dataBasePaths[1];
+            string activePath = dataBasePaths[0];
             lock (barometriDbLock)
             {
                 if (File.Exists(activePath))
