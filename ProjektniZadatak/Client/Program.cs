@@ -111,7 +111,7 @@ namespace Client
                             proxyC2C.SendMessage(ClientMessage.stop, signStop);
                             break;
                         case "SenzoriTemperature":
-                            proxyC2DB.WriteToSoundDb(message, signMessage);
+                            proxyC2DB.WriteToTempDb(message, signMessage);
 
                             proxyC2C.SendMessage(ClientMessage.stop, signStop);
                             break;
