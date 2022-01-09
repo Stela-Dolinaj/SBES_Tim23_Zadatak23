@@ -17,11 +17,31 @@ namespace Server
 {
     public class DatabaseHandlingService : IDatabaseHandling, IClientCommunications
     {
+        private static string[] dataBasePaths = { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
+        
         private static bool barometriDatabaseOpen = true;
         private static bool senzoriTemperatureDatabaseOpen = true;
         private static bool senzoriZvukaDatabaseOpen = true;
+
         EventLog eventLog = new EventLog("Application");
-        
+
+        #region Locks
+        private static object barometriDbOpenLock = new object();
+        private static object senzoriTempDbOpenLock = new object();
+        private static object senzoriZvukaDbOpenLock = new object();
+
+        private static object barometriDbLock = new object();
+        private static object senzoriTempDbLock = new object();
+        private static object senzoriZvukaDbLock = new object();
+        #endregion
+
+        public void TestCommunication()
+        {
+            Console.WriteLine("[Client:TestCommunication]>> Test success!");
+        }
+
+        #region SendMessage
+
         /// <summary>
         /// Stize poruka na servis.
         /// Analiziraj poruku:
@@ -57,9 +77,7 @@ namespace Server
             }
             else
             {
-                
-               
-                Console.WriteLine("Client {0} from group {1} has been authorised to use function SendMessage",clientName,clientGroup);
+                Console.WriteLine("Client {0} from group {1} has been authorised to use function SendMessage", clientName, clientGroup);
                 eventLog.Source = "Application";
                 eventLog.WriteEntry("Client has been granted access to SendMessage function", EventLogEntryType.Information, 101, 1);
             }
@@ -73,7 +91,10 @@ namespace Server
                     /// -> zavrsio je upis u BP i zeli da otvori kanal
                     if (messageForClients.ToString().ToLower().Equals("stop"))
                     {
-                        barometriDatabaseOpen = true;
+                        lock (barometriDbOpenLock)
+                        {
+                            barometriDatabaseOpen = true;
+                        }
                         Console.WriteLine("[Barometri]: OPEN");
                         return true;
                     }
@@ -83,16 +104,19 @@ namespace Server
                     /// -> ako je kanal ZATVOREN, dobice povratnu vrednost FALSE, kako bi znao da ne moze da upisuje
                     else if (messageForClients.ToString().ToLower().Equals("start"))
                     {
-                        if (barometriDatabaseOpen)
+                        lock (barometriDbOpenLock)
                         {
-                            barometriDatabaseOpen = false;
-                            Console.WriteLine("[Barometri]: CLOSED");
-                            return true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("[Barometri]: ACCESS DENIED, DB ALREADY IN USE!");
-                            return false;
+                            if (barometriDatabaseOpen)
+                            {
+                                barometriDatabaseOpen = false;
+                                Console.WriteLine("[Barometri]: CLOSED");
+                                return true;
+                            }
+                            else
+                            {
+                                Console.WriteLine("[Barometri]: ACCESS DENIED, DB ALREADY IN USE!");
+                                return false;
+                            }
                         }
                     }
                     else
@@ -102,22 +126,28 @@ namespace Server
                 case UserGroup.SenzoriTemperature:
                     if (messageForClients.ToString().ToLower().Equals("stop"))
                     {
-                        senzoriTemperatureDatabaseOpen = true;
+                        lock (senzoriTempDbOpenLock)
+                        {
+                            senzoriTemperatureDatabaseOpen = true;
+                        }
                         Console.WriteLine("[Temperatura]: OPEN");
                         return true;
                     }
                     else if (messageForClients.ToString().ToLower().Equals("start"))
                     {
-                        if (senzoriTemperatureDatabaseOpen)
+                        lock (senzoriTempDbOpenLock)
                         {
-                            senzoriTemperatureDatabaseOpen = false;
-                            Console.WriteLine("[Temperatura]: CLOSED");
-                            return true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("[Temperatura]: ACCESS DENIED, DB ALREADY IN USE!");
-                            return false;
+                            if (senzoriTemperatureDatabaseOpen)
+                            {
+                                senzoriTemperatureDatabaseOpen = false;
+                                Console.WriteLine("[Temperatura]: CLOSED");
+                                return true;
+                            }
+                            else
+                            {
+                                Console.WriteLine("[Temperatura]: ACCESS DENIED, DB ALREADY IN USE!");
+                                return false;
+                            }
                         }
                     }
                     else
@@ -127,22 +157,28 @@ namespace Server
                 case UserGroup.SenzoriZvuka:
                     if (messageForClients.ToString().ToLower().Equals("stop"))
                     {
-                        senzoriZvukaDatabaseOpen = true;
+                        lock (senzoriZvukaDbOpenLock)
+                        {
+                            senzoriZvukaDatabaseOpen = true;
+                        }
                         Console.WriteLine("[Zvuk]: OPEN");
                         return true;
                     }
                     else if (messageForClients.ToString().ToLower().Equals("start"))
                     {
-                        if (senzoriZvukaDatabaseOpen)
+                        lock (senzoriZvukaDbOpenLock)
                         {
-                            senzoriZvukaDatabaseOpen = false;
-                            Console.WriteLine("[Zvuk]: CLOSED");
-                            return true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("[Zvuk]: ACCESS DENIED, DB ALREADY IN USE!");
-                            return false;
+                            if (senzoriZvukaDatabaseOpen)
+                            {
+                                senzoriZvukaDatabaseOpen = false;
+                                Console.WriteLine("[Zvuk]: CLOSED");
+                                return true;
+                            }
+                            else
+                            {
+                                Console.WriteLine("[Zvuk]: ACCESS DENIED, DB ALREADY IN USE!");
+                                return false;
+                            }
                         }
                     }
                     else
@@ -154,13 +190,10 @@ namespace Server
             }
         }
 
-        public void TestCommunication()
-        {
-            Console.WriteLine("[Client:TestCommunication]>> Test success!");
-        }
+        #endregion
 
 
-        /*////////////////////////////////////////////////////*/
+        #region WriteToPressureDb
 
         /// <summary>
         /// Upis u DB
@@ -168,7 +201,7 @@ namespace Server
         /// <param name="message">Formatirana poruka koju upisujem u DB</param>
         /// <param name="userGroup">Grupa kojoj korisnik pripada</param>
         /// <returns>true ako je uspela operacija, false u suprotnom slucaju</returns>
- 
+
         public void WriteToPressureDb(string message, byte[] sign)
         {
             // Provera digitalnog potpisa
@@ -192,7 +225,7 @@ namespace Server
             }
             else
             {
-                Console.WriteLine("Client {0} from group {1} has been authorised to use function WriteToPressureDb",clientName ,clientGroup);
+                Console.WriteLine("Client {0} from group {1} has been authorised to use function WriteToPressureDb", clientName, clientGroup);
                 eventLog.Source = "Application";
                 eventLog.WriteEntry("Client has been granted access", EventLogEntryType.Information, 101, 1);
             }
@@ -202,31 +235,26 @@ namespace Server
                 throw new InvalidOperationException("User has no group.");
             }
 
-            string[] dataBasePaths =
-                { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
-
-            string activePath;
-            if (clientGroup.ToString() == "Barometri")
+            // Uvek pisemo u barometri.txt posto je ova metoda samo za upis u tu datotetku
+            string activePath = dataBasePaths[1];
+            lock (barometriDbLock)
             {
-                activePath = dataBasePaths[1];
-            }
-            else
-            {
-                activePath = dataBasePaths[0];
-            }
-
-
-            if (File.Exists(activePath))
-            {
-                File.AppendAllText(activePath, message + Environment.NewLine);
-            }
-            else
-            {
-                File.WriteAllText(activePath, message + Environment.NewLine);
+                if (File.Exists(activePath))
+                {
+                    File.AppendAllText(activePath, message + Environment.NewLine);
+                }
+                else
+                {
+                    File.WriteAllText(activePath, message + Environment.NewLine);
+                }
             }
 
             Console.WriteLine($"[{clientGroup.ToString()}]: {message}");
         }
+
+        #endregion
+
+        #region WriteToSoundDb
 
         public void WriteToSoundDb(string message, byte[] sign)
         {
@@ -261,31 +289,26 @@ namespace Server
                 throw new InvalidOperationException("User has no group.");
             }
 
-            string[] dataBasePaths =
-                { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
-
-            string activePath;
-            if (clientGroup.ToString() == "SenzoriZvuka")
+            // Uvek pisemo u senzoriZvuka.txt posto je ova metoda samo za upis u tu datotetku
+            string activePath = dataBasePaths[2];
+            lock (senzoriZvukaDbLock)
             {
-                activePath = dataBasePaths[2];
-            }
-            else
-            {
-                activePath = dataBasePaths[0];
-            }
-
-
-            if (File.Exists(activePath))
-            {
-                File.AppendAllText(activePath, message + Environment.NewLine);
-            }
-            else
-            {
-                File.WriteAllText(activePath, message + Environment.NewLine);
+                if (File.Exists(activePath))
+                {
+                    File.AppendAllText(activePath, message + Environment.NewLine);
+                }
+                else
+                {
+                    File.WriteAllText(activePath, message + Environment.NewLine);
+                }
             }
 
             Console.WriteLine($"[{clientGroup.ToString()}]: {message}");
         }
+
+        #endregion
+
+        #region WriteToTempDb
 
         public void WriteToTempDb(string message, byte[] sign)
         {
@@ -320,30 +343,23 @@ namespace Server
                 throw new InvalidOperationException("User has no group.");
             }
 
-            string[] dataBasePaths =
-                { "barometri.txt", "senzoriTemperature.txt", "senzoriZvuka.txt" };
-
-            string activePath;
-            if(clientGroup.ToString() == "SenzoriTemperature")
+            // Uvek pisemo u senzoriTemperature.txt posto je ova metoda samo za upis u tu datotetku
+            string activePath = dataBasePaths[1];
+            lock (senzoriTempDbLock)
             {
-                activePath = dataBasePaths[1];
-            }
-            else
-            {
-                activePath = dataBasePaths[0];
-            }
-            
-
-            if (File.Exists(activePath))
-            {
-                File.AppendAllText(activePath, message + Environment.NewLine);
-            }
-            else
-            {
-                File.WriteAllText(activePath, message + Environment.NewLine);
+                if (File.Exists(activePath))
+                {
+                    File.AppendAllText(activePath, message + Environment.NewLine);
+                }
+                else
+                {
+                    File.WriteAllText(activePath, message + Environment.NewLine);
+                }
             }
 
             Console.WriteLine($"[{clientGroup.ToString()}]: {message}");
         }
+
+        #endregion
     }
 }

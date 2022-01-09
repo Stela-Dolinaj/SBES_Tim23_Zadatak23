@@ -61,7 +61,7 @@ namespace Client
             // Digitalno potpisivanje start i stop poruka
             string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
             X509Certificate2 signCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
-            
+
 
             byte[] signStart = DigitalSignature.Create(ClientMessage.start.ToString(), HashAlgorithm.SHA1, signCert);
             byte[] signStop = DigitalSignature.Create(ClientMessage.stop.ToString(), HashAlgorithm.SHA1, signCert);
@@ -69,38 +69,36 @@ namespace Client
 
             bool canStart;
             UserGroup myGroup = proxyC2C.myGroup;
-            
+
             Console.WriteLine("**********************************");
-            Console.WriteLine("Dear user your group is: "+myGroup);
+            Console.WriteLine("Dear user your group is: " + myGroup);
             Console.WriteLine("**********************************");
             Console.WriteLine();
 
-            Console.ReadLine();
             while (true)
             {
-                
+
                 Console.WriteLine(">> Press [enter] to start sending. [q] - quit");
                 if (Console.ReadLine().Equals("q"))
                     break;
-                
-                canStart = proxyC2C.SendMessage(ClientMessage.start, signStart);
-                
 
-                    if (canStart)
+                canStart = proxyC2C.SendMessage(ClientMessage.start, signStart);
+
+                if (canStart)
                 {
                     // Pauza da bi se dokazalo da drugi klijenti iste grupe u ovom momentu ne mogu da pristupe bazi podataka
                     Console.WriteLine(">> Ready to send message. Press [enter] to send.");
                     Console.ReadLine();
 
                     string message = GenerateMeasurement(myGroup);
-                    
+
                     Console.WriteLine();
                     // Digitalno potpisivanje poruke
                     signMessage = DigitalSignature.Create(message, HashAlgorithm.SHA1, signCert);
 
                     Console.WriteLine(">> Sent message : " + message);
                     //Dodaj da zna kome da salje
-                    switch(myGroup.ToString())
+                    switch (myGroup.ToString())
                     {
                         case "Barometri":
                             proxyC2DB.WriteToPressureDb(message, signMessage);
@@ -122,7 +120,7 @@ namespace Client
                             break;
 
                     }
-                    
+
                 }
                 else
                 {
