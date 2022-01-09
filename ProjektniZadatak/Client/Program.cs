@@ -23,14 +23,6 @@ namespace Client
             // pokreni visualstudio u admin modu da bi Debugger.Launch() radilo
             //Debugger.Launch();
 
-            //mene nesto interesuje, ovako log radi cisto da znate mozete ovo izbrisati
-            /*
-            EventLog eventLog = new EventLog("Application");
-            eventLog.Source = "Application";
-            eventLog.WriteEntry("Ako nusta barem ovo radi", EventLogEntryType.Information, 101, 1);
-            Console.WriteLine("Prosao log");
-            Console.ReadLine();
-            */
             // Serverski sertifikat
             string serverCertNC = "wcfservice";
 

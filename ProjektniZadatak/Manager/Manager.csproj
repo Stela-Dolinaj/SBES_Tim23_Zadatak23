@@ -49,9 +49,6 @@
     <Compile Include="AuditEventFile.Designer.cs" />
     <Compile Include="AuditEvents.cs" />
     <Compile Include="CertManager.cs" />
-    <Compile Include="CustomAuthorizationManager.cs" />
-    <Compile Include="CustomAuthorizationPolicy.cs" />
-    <Compile Include="CustomPrincipal.cs" />
     <Compile Include="DigitalSignature.cs" />
     <Compile Include="Formatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,9 +68,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AuditEventFile.resx" />
-    <EmbeddedResource Include="RolesConfigFile.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="RolesConfigFile1.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RolesConfigFile1.Designer.cs</LastGenOutput>

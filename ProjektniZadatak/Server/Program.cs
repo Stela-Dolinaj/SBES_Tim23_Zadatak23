@@ -51,17 +51,7 @@ namespace Server
             // Postavljanje servisnog sertifikata
             host.Credentials.ServiceCertificate.Certificate =
                 CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, serviceCertCN);
-
-            
-            /*
-            //Auditing
-            ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
-            newAudit.AuditLogLocation = AuditLogLocation.Application;
-            newAudit.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
-
-            host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            host.Description.Behaviors.Add(newAudit);*/
-
+        
             try
             {
                 host.Open();
