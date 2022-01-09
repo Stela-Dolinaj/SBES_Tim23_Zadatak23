@@ -56,6 +56,10 @@ namespace Server
 
         public bool SendMessage(ClientMessage messageForClients, byte[] sign)
         {
+            // Log uspesne autentifikacije
+            eventLog.Source = "Application";
+            eventLog.WriteEntry("[SendMessage] Client has been successfully authenticated", EventLogEntryType.Information, 101, 1);
+
             // Provera digitalnog potpisa.
             string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
@@ -204,6 +208,10 @@ namespace Server
 
         public void WriteToPressureDb(string message, byte[] sign)
         {
+            // Log uspesne autentifikacije
+            eventLog.Source = "Application";
+            eventLog.WriteEntry("[WriteToPressureDb] Client has been successfully authenticated", EventLogEntryType.Information, 101, 1);
+
             // Provera digitalnog potpisa
             string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
@@ -258,6 +266,10 @@ namespace Server
 
         public void WriteToSoundDb(string message, byte[] sign)
         {
+            // Log uspesne autentifikacije
+            eventLog.Source = "Application";
+            eventLog.WriteEntry("[WriteToSoundDb] Client has been successfully authenticated", EventLogEntryType.Information, 101, 1);
+
             // Provera digitalnog potpisa
             string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
@@ -312,6 +324,10 @@ namespace Server
 
         public void WriteToTempDb(string message, byte[] sign)
         {
+            // Log uspesne autentifikacije
+            eventLog.Source = "Application";
+            eventLog.WriteEntry("[WriteToTempDb] Client has been successfully authenticated", EventLogEntryType.Information, 101, 1);
+
             // Provera digitalnog potpisa
             string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name).Split(',')[0];
             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientName);
